@@ -3,7 +3,7 @@
   // But eventually, with a database, these should be set automatically
   // ONLY after the user's login credentials have been verified via a 
   // database query.
-  session_start();
+  session_start();                              
   $_SESSION['logged_in'] = false;
   $_SESSION['account_type'] = 'seller';
 ?>
@@ -23,6 +23,15 @@
   <link rel="stylesheet" href="css/custom.css">
 
   <title>[My Auction Site] <!--CHANGEME!--></title>
+  <script>
+        function select_change() {       //this method of onchange when you select "other" is from the internet 
+            if (document.getElementById("auctionCategory").value == "other") {
+                document.getElementById("newCategory").style.display = "block";
+            } else {
+                document.getElementById("newCategory").style.display = "none";
+            }
+        }
+    </script>
 </head>
 
 
