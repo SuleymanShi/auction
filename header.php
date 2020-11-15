@@ -28,15 +28,14 @@
 
 <!-- Navbars -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light mx-2">
-  <a class="navbar-brand" href="#">
-    <?php
-    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-      echo "Welcome! {$_SESSION['username']}";
-    }else{
-      echo "Site Name";
-    }
-     ?>
-     <!--CHANGEME!--></a>
+  <a class="navbar-brand" href="#">Site Name <!--CHANGEME!--></a>
+     <a class="navbar-brand text-center" href="#">
+       <?php
+       if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+         echo "Welcome! {$_SESSION['username']}";
+       }
+        ?>
+     </a>
   <ul class="navbar-nav ml-auto">
     <li class="nav-item">
 
