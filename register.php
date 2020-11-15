@@ -2,9 +2,7 @@
 
 <div class="container">
 <h2 class="my-3">Register new account</h2>
-<?php
-$link=mysqli_connect('localhost','root','','auctiondata')
-?>
+
 <!-- Create auction form -->
 <form method="POST" action="process_registration.php">
   <div class="form-group row">
