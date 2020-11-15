@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = '';
+$password = "";
 $dbname = "comp0022";
 
 // Create connection
@@ -50,22 +50,22 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     PRIMARY KEY (`categoryID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     CREATE TABLE `BiddingHistory` (
-    `itemID` int(11) NOT NULL,
+    `ItemID` int(11) NOT NULL,
     `buyerEmail` varchar(30) NOT NULL,
     `biddingTime` datetime NOT NULL,
     `bidPrice` double NOT NULL,
-    PRIMARY KEY (`itemID`,`buyerEmail`,`biddingTime`),
+    PRIMARY KEY (`ItemID`,`buyerEmail`,`biddingTime`),
     KEY `buyerEmail` (`buyerEmail`),
-    CONSTRAINT `biddinghistory_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `Item` (`itemID`),
+    CONSTRAINT `biddinghistory_ibfk_1` FOREIGN KEY (`ItemID`) REFERENCES `Item` (`itemID`),
     CONSTRAINT `biddinghistory_ibfk_2` FOREIGN KEY (`buyerEmail`) REFERENCES `User` (`email`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     CREATE TABLE `WatchList` (
-    `itemID` int(11) NOT NULL,
+    `ItemID` int(11) NOT NULL,
     `BuyerEmail` varchar(30) NOT NULL,
-    PRIMARY KEY (`itemID`,`BuyerEmail`),
+    PRIMARY KEY (`ItemID`,`BuyerEmail`),
     KEY `BuyerEmail` (`BuyerEmail`),
     CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`BuyerEmail`) REFERENCES `User` (`email`),
-    CONSTRAINT `watchlist_ibfk_2` FOREIGN KEY (`itemID`) REFERENCES `Item` (`itemID`)
+    CONSTRAINT `watchlist_ibfk_2` FOREIGN KEY (`ItemID`) REFERENCES `Item` (`itemID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     CREATE TABLE `Auction` (
     `itemID` int(11) NOT NULL,
