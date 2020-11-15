@@ -115,14 +115,15 @@
 <?php else: ?>
      Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p>  
     <p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
-
+    <!-- Pass item_id variable to place_bid.php-->
+    <?php $_SESSION["item_id"] = $item_id ?>
     <!-- Bidding form -->
     <form method="POST" action="place_bid.php">
       <div class="input-group">
         <div class="input-group-prepend">
           <span class="input-group-text">£</span>
         </div>
-	    <input type="number" class="form-control" id="bid">
+      <input type="number" class="form-control" id="bid" name="bid">
       </div>
       <button type="submit" class="btn btn-primary form-control">Place bid</button>
     </form>

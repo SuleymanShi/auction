@@ -62,17 +62,17 @@
   print_listing_li($item_id, $title, $description, $current_price, $num_bids, $end_date);
 
   // TODO: Check user's credentials (cookie/session).
-  if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'buyer' || $_SESSION['logged_in'] != true) {
-     header('Location: browse.php');
-   }
+  //  if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'buyer' || $_SESSION['logged_in'] != true) {
+  //     header('Location: browse.php');
+  //   }
 
   // TODO: Perform a query to pull up the auctions they've bidded on.
   
   //connect to database.
   include_once("connect_database.php");
-  // //for test
-  // $_SESSION['username'] = '871222456@qq.com';
-  // $username = $_SESSION['username'];
+  //for test
+  $_SESSION['username'] = '871222456@qq.com';
+  $username = $_SESSION['username'];
 
   $sql_number_of_bided_items =
   "SELECT COUNT(itemId) AS number_of_bided_items
@@ -118,7 +118,7 @@
     echo "You haven't bidded on anything.";
   }
   // close the connection to database.
-  $conn->close;
+  $conn->close();
 ?>
 
 </ul>

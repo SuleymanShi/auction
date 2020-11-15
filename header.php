@@ -5,7 +5,7 @@
   // database query.
   session_start();
   $_SESSION['logged_in'] = false;
-  $_SESSION['account_type'] = 'seller';
+  $_SESSION['account_type'] = 'buyer';
 ?>
 
 
