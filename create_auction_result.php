@@ -14,24 +14,17 @@
     }
     mysqli_set_charset($con,'utf8');  
 
-    if(strlen($_POST['auctionTitle'])>30){                             //check the validation of data
-        exit('the length of Title overflow(longer than 30)');
+    if(strlen($_POST['auctionTitle'])>30){                           //check the validation of data
+        echo"<script>alert('The length of Title overflow(longer than 30)');history.go(-1);</script>"; 
     }
 
     if(strlen($_POST['auctionDetails'])>200){
-      exit('the length of Details overflow(longer than 200)');
+      echo"<script>alert('The length of Details overflow(longer than 200)');history.go(-1);</script>";
     }
 
-    if(($_POST['auctionCategory']=='other') and $_POST['newCate']==''){
-      exit('Please input a Category(write your category in the box below)');
-    }
 
-    if($_POST['auctionCategory']=='Choose...'){
-      exit('Please select a Category');
-    }
-
-    if($_POST['auctionCategory']=='other' && strlen($_POST['newCate'])>10){
-      exit('the length of Category overflow(longer than 10)');
+    if($_POST['auctionCate']=='Choose...'){
+      echo"<script>alert('Please select a certain category');history.go(-1);</script>";
     }
 
     $itemID = 0;                                          //get the itemID from mysql
@@ -52,28 +45,14 @@
 
     $categoryID = 0;
 
-    $auctionCategory = $_POST['auctionCategory'];
-
-    if($_POST['auctionCategory']!='other'){                
-      $cat = "select categoryID from Category where description = ".$auctionCategory;
-      $resource = mysqli_query($con,$cat);
-      $findID = mysqli_fetch_assoc($resource);
-      $categoryID = $findID["categoryID"];
-    }else{
-      $max = "select max(categoryID) from Category";         //insert new category into table 
-      $resource = mysqli_query($con,$max);
-      $maxID = mysqli_fetch_assoc($resource);
-      $categoryID = $maxID["max(categoryID)"] + 1;
-      $newCategory = $_POST['newCate'];
-      $sql =  "INSERT INTO Category ".
-              "(categoryID,description ) ".
-              "VALUES ".
-              "('$categoryID','$newCategory')";
-      $ins = mysqli_query($con, $sql);
-      if(!$ins){
-          exit('Can\'t save your data of new category: '.mysqli_error($con));
-        }
+    $auctionCategory = $_POST['auctionCate'];
+               
+    $cat = "select categoryID from Category where description = \"".$auctionCategory."\"";
+    $resource = mysqli_query($con,$cat);
+    while($row = mysqli_fetch_assoc($resource)) {
+      $categoryID = $row["categoryID"];
     }
+    
 
     $startingPrice = (double)$_POST['auctionStartPrice'];
 
@@ -85,17 +64,6 @@
 
     $username = $_SESSION['username'];
 
-    $sql = "INSERT INTO Auction ".                                //insert all the data into mysql
-            "(itemID,categoryID,startingPrice,currentPrice,reservePrice,sellerEmail,endDate ) ".
-            "VALUES ".
-            "('$itemID','$categoryID','$startingPrice','$currentPrice','$reservePrice','$username','$endDate')";
-      
-    $ins = mysqli_query($con, $sql);
-    if(!$ins)
-    {
-      exit('Can\'t save your data of auction: '.mysqli_error($con));
-    }
-
     $sql = "INSERT INTO Item ".
             "(itemID,title,description,sellerEmail) ".
             "VALUES ".
@@ -106,6 +74,19 @@
     {
       exit('Can\'t save your data of item: '.mysqli_error($con));
     }
+
+    $sql = "INSERT INTO Auction ".                                //insert all the data into mysql
+            "(itemID,categoryID,startingPrice,currentPrice,reservePrice,endDate,sellerEmail ) ".
+            "VALUES ".
+            "('$itemID','$categoryID','$startingPrice','$currentPrice','$reservePrice','$endDate','$username')";
+      
+    $ins = mysqli_query($con, $sql);
+    if(!$ins)
+    {
+      exit('Can\'t save your data of auction: '.mysqli_error($con));
+    }
+
+    
 
     echo "Successfully save your data<br />";                        //inform users after saving all the data
 
