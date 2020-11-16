@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "root";
+$password = "";
 $dbname = "comp0022";
 
 // Create connection
@@ -60,7 +60,7 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     CONSTRAINT `biddinghistory_ibfk_2` FOREIGN KEY (`buyerEmail`) REFERENCES `User` (`email`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     CREATE TABLE `WatchList` (
-    `ItemID` int(11) NOT NULL,
+    `itemID` int(11) NOT NULL,
     `BuyerEmail` varchar(30) NOT NULL,
     PRIMARY KEY (`ItemID`,`BuyerEmail`),
     KEY `BuyerEmail` (`BuyerEmail`),
@@ -75,12 +75,14 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     `currentPrice` double NOT NULL,
     `reservePrice` double NOT NULL,
     `endDate` date NOT NULL,
+    `numBid` int(11) NOT NULL,
     PRIMARY KEY (`itemID`),
     KEY `sellerEmail` (`sellerEmail`),
     KEY `categoryID` (`categoryID`),
     CONSTRAINT `auction_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `Item` (`itemID`),
     CONSTRAINT `auction_ibfk_2` FOREIGN KEY (`sellerEmail`) REFERENCES `User` (`email`),
     CONSTRAINT `auction_ibfk_3` FOREIGN KEY (`categoryID`) REFERENCES `Category` (`categoryID`)
+    KEY `numBid` (`numBid`),
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
     if ($conn->multi_query($sql_tables) === TRUE) {
