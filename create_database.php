@@ -1,69 +1,128 @@
 
 <?php
 header('Content-type:text/html;charset=utf-8');
-define('DB_HOST','localhost');
-define('DB_USER','root');
-define('DB_PASSWORD','');
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "comp0022";
+$user_table="user";
+$item_table="Item";
+$category_table="category";
+$bid_table="biddingHistory";
+$watchlist_table="watchlist";
+$auction_table="auction";
+
 
 //Create a database if there is none
-$link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD);
-$create_database="CREATE  DATABASE IF NOT EXISTS  comp0022";
+$link = new mysqli($servername, $username, $password);
+$create_database="CREATE  DATABASE IF NOT EXISTS $dbname";
 mysqli_query($link, $create_database);
 if(mysqli_errno($link)){     //check error!
   exit(mysqli_error($link));
 }
-// $link->query($create_database);
 mysqli_close($link);
 ?>
 
-<!--Create a user table-->
+<!--Create user table-->
 <?php
-$link=mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, 'comp0022');
-$create_users = "CREATE TABLE if not exists USERS (
+$link=mysqli_connect($servername, $username, $password, $dbname);
+$create_user = "CREATE TABLE if not exists $user_table (
     email VARCHAR(30) NOT NULL PRIMARY KEY,
     password VARCHAR(30) NOT NULL,
-    account_type VARCHAR(10) NOT NULL)";
-mysqli_query($link, $create_users);
-  if(mysqli_errno($link)){     //check error!
+    role VARCHAR(10) NOT NULL)
+    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+mysqli_query($link, $create_user);
+  if(mysqli_errno($link)){             //check error!
     exit(mysqli_error($link));
   }
 
 mysqli_close($link);
 ?>
-<!--You can create any other tables below-->
+<!--Create item table-->
 <?php
-$link=mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, 'comp0022');
-$create_auction = "CREATE TABLE if not exists AUCTIONS (
+$link=mysqli_connect($servername, $username, $password, $dbname);
+$create_item = "CREATE TABLE if not exists $item_table (
     itemID INT(6) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(30) NOT NULL,
-    categoryID INT NOT NULL,
-    startingPrice FLOAT NOT NULL,
-    currentPrice FLOAT NOT NULL,
-    reservePrice FLOAT NOT NULL,
-    endDate date NOT NULL)";
+    sellerEmail VARCHAR(30) NOT NULL,
+    description VARCHAR(30) NOT NULL,
+    title VARCHAR(10) NOT NULL,
+    CONSTRAINT `item_1` FOREIGN KEY (`sellerEmail`) REFERENCES `$user_table` (`email`))
+    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+mysqli_query($link, $create_item);
+  if(mysqli_errno($link)){
+    exit(mysqli_error($link));
+  }
+mysqli_close($link);
+?>
+
+<!--Create category table-->
+<?php
+$link=mysqli_connect($servername, $username, $password, $dbname);
+$create_category = "CREATE TABLE if not exists $category_table (
+    categoryID INT(6) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(30) NOT NULL)
+    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+mysqli_query($link, $create_category);
+  if(mysqli_errno($link)){     //check error!
+    exit(mysqli_error($link));
+  }
+mysqli_close($link);
+?>
+
+<!--Create biddingHistory table-->
+<?php
+$link=mysqli_connect($servername, $username, $password, $dbname);
+$create_bid = "CREATE TABLE if not exists $bid_table (
+    itemID INT(6) NOT NULL ,
+    buyerEmail VARCHAR(30) NOT NULL ,
+    biddingTime datetime NOT NULL ,
+    bidPrice double NOT NULL,
+    PRIMARY KEY(itemID,buyerEmail,biddingTime),
+    CONSTRAINT `bid_1` FOREIGN KEY (`itemID`) REFERENCES `$item_table` (`itemID`),
+    CONSTRAINT `bid_2` FOREIGN KEY (`buyerEmail`) REFERENCES `$user_table` (`email`))
+    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+mysqli_query($link, $create_bid);
+  if(mysqli_errno($link)){     //check error!
+    exit(mysqli_error($link));
+  }
+mysqli_close($link);
+?>
+
+<!--Create watchlist table-->
+<?php
+$link=mysqli_connect($servername, $username, $password, $dbname);
+$create_watchlist = "CREATE TABLE if not exists $watchlist_table (
+    itemID INT(6) NOT NULL,
+    buyerEmail VARCHAR(30) NOT NULL,
+    PRIMARY KEY(itemID, buyerEmail),
+    CONSTRAINT `watch_1` FOREIGN KEY (`BuyerEmail`) REFERENCES `$user_table` (`email`),
+    CONSTRAINT `watch_2` FOREIGN KEY (`ItemID`) REFERENCES `$item_table` (`itemID`))
+    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+mysqli_query($link, $create_watchlist);
+  if(mysqli_errno($link)){     //check error!
+    exit(mysqli_error($link));
+  }
+mysqli_close($link);
+?>
+
+<!--Create auction table-->
+<?php
+$link=mysqli_connect($servername, $username, $password, $dbname);
+$create_auction = "CREATE TABLE if not exists $auction_table (
+  itemID int(11) NOT NULL PRIMARY KEY,
+  sellerEmail varchar(30) NOT NULL,
+  categoryID int(11) NOT NULL,
+  startingPrice double NOT NULL,
+  currentPrice double NOT NULL,
+  reservePrice double NOT NULL,
+  endDate date NOT NULL,
+  CONSTRAINT `auction_1` FOREIGN KEY (`itemID`) REFERENCES `$item_table` (`itemID`),
+  CONSTRAINT `auction_2` FOREIGN KEY (`sellerEmail`) REFERENCES `$user_table` (`email`),
+  CONSTRAINT `auction_3` FOREIGN KEY (`categoryID`) REFERENCES `$category_table` (`categoryID`))
+  ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 mysqli_query($link, $create_auction);
   if(mysqli_errno($link)){     //check error!
     exit(mysqli_error($link));
   }
-
-mysqli_close($link);
-?>
-
-<?php
-$link=mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, 'comp0022');
-$create_item = "CREATE TABLE if not exists ITEMS (
-    itemID INT(6) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(30) NOT NULL,
-    itemTitle VARCHAR(30) NOT NULL,
-    Description VARCHAR(200) NOT NULL,
-    CONSTRAINT `ITEMS_ibfk_1` FOREIGN KEY (`email`) REFERENCES `USERS` (`email`)
-    -- CONSTRAINT `ITEMS_ibfk_1` FOREIGN KEY (`email`) REFERENCES `USERS` (`email`)
-  )";
-
-mysqli_query($link, $create_item);
-  if(mysqli_errno($link)){     //check error!
-    exit(mysqli_error($link));
-  }
-
 mysqli_close($link);
 ?>

@@ -42,8 +42,8 @@ elseif (empty($_POST['password'])){
 
 
 //select username and password from database to match
-$link=mysqli_connect(DB_HOST,DB_USER,DB_PASSWORD,'comp0022');
-$query="SELECT * from users where users.email='{$_POST['email']}'";
+$link=mysqli_connect($servername,$username,$password,$dbname);
+$query="SELECT * from $user_table where $user_table.email='{$_POST['email']}'";
 $result=mysqli_query($link,$query);
 $user_data=mysqli_fetch_assoc($result);
 $user_password=$user_data['password'];
@@ -61,7 +61,7 @@ if ($_POST['password']===$user_password){
 	echo '<h2 class="my-3 text-center">Login succesful! Jumping in 3s!</h2>';
 	$_SESSION['logged_in'] = true;
   $_SESSION['username']=$_POST['email'];
-	$_SESSION['account_type'] = $user_data['account_type'];
+	$_SESSION['account_type'] = $user_data['role'];
 	header ("refresh:3;url=browse.php");
 }
 else{

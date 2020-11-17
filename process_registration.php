@@ -15,8 +15,6 @@
 </head>
 <body>
 
-
-
   <?php include_once("create_database.php")?>
   <?php
 
@@ -73,32 +71,32 @@
       header("refresh:3;url=register.php");
       exit();
   }
-  else{
-    $_SERVER['REQUEST_METHOD']=='POST';
-    $email=$_POST['email'];
-    $account_type=$_POST['accountType'];
-    $password=$_POST['password'];
+
+
+ // check wheher account has been registered or not
+  $link=mysqli_connect($servername, $username, $password, $dbname);
+  $query="SELECT * from $user_table where $user_table.email='{$_POST['email']}'";
+  $result=mysqli_query($link,$query);
+  $user_data=mysqli_fetch_assoc($result);
+  if (!empty($user_data)){
+      echo '<h2 class="my-3 text-center">Sorry! Account has been registered already</h2>';
+      header("refresh:5;url=register.php");
+      exit();
   }
 
   //POST value to database
-  $link=mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, 'comp0022');
-  $query="Insert into USERS (email, account_type, password) VALUES ('$email', '$account_type', '$password' )";
-
+  $a=$_POST['email'];
+  $b=$_POST['accountType'];
+  $c=$_POST['password'];
+  $query="Insert into $user_table (email, role, password) VALUES ('$a', '$b', '$c' )";
 
   if (mysqli_query($link, $query)){
       echo '<h2 class="my-3 text-center">Congratulations! Account has been created</h2>';
         header("refresh:3;url=browse.php");
-  } else{
-      if (mysqli_errno($link)==1062){
-          echo '<h2 class="my-3 text-center">Sorry! Account has been registered already</h2>';
-          header("refresh:3;url=register.php");
-          exit();
-      }
-      else {
+  }else {
           echo $link -> error;
       }
-  }
-
+  mysqli_close($link);
   ?>
 
 
