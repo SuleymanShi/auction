@@ -14,9 +14,10 @@
   
   
   // TODO: Check user's credentials (cookie/session).
-  // if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'buyer' || $_SESSION['logged_in'] != true) {
-  //   header('Location: browse.php');
-  // }
+  if (!isset($_SESSION['account_type']) || $_SESSION['logged_in'] != true || $_SESSION['account_type'] != 'buyer' ) {
+    echo("You have not logged in or are not a buyer. You will be redirected shortly.");
+    header('refresh:5;url=browse.php');
+   }
   // TODO: Perform a query to pull up auctions they might be interested in.
   include_once("connect_database.php");
   $username = $_SESSION['username'];

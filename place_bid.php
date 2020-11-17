@@ -16,8 +16,8 @@ require_once("PHPMailer/POP3.php");
 // Notify user of success/failure and redirect/give navigation options.
 
 //test code
-session_start();
-$_SESSION["username"] = "871222456@qq.com";
+//session_start();
+//$_SESSION["username"] = "871222456@qq.com";
 //echo($_SESSION["username"]);
 
 $item_id = $_SESSION["item_id"];
@@ -133,4 +133,5 @@ $highest_bid = $row_highest_bid["currentPrice"];
 //close the connection to database
 $conn->close();
 //redirect to original listing.php 
-$url ="listing.php?item_id=".$item_id; header("refresh:5;url=$url")?>
+$url ="listing.php?item_id=".$item_id; 
+header("refresh:5;url=$url")?>
