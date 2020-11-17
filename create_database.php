@@ -1,6 +1,4 @@
-
 <?php
-header('Content-type:text/html;charset=utf-8');
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -11,118 +9,93 @@ $category_table="category";
 $bid_table="biddingHistory";
 $watchlist_table="watchlist";
 $auction_table="auction";
-
-
-//Create a database if there is none
-$link = new mysqli($servername, $username, $password);
-$create_database="CREATE  DATABASE IF NOT EXISTS $dbname";
-mysqli_query($link, $create_database);
-if(mysqli_errno($link)){     //check error!
-  exit(mysqli_error($link));
+// Create connection
+$conn = new mysqli($servername, $username, $password);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
 }
-mysqli_close($link);
-?>
 
-<!--Create user table-->
-<?php
-$link=mysqli_connect($servername, $username, $password, $dbname);
-$create_user = "CREATE TABLE if not exists $user_table (
-    email VARCHAR(30) NOT NULL PRIMARY KEY,
-    password VARCHAR(30) NOT NULL,
-    role VARCHAR(10) NOT NULL)
-    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-mysqli_query($link, $create_user);
-  if(mysqli_errno($link)){             //check error!
-    exit(mysqli_error($link));
-  }
+//check whether the databse exsits
+$sql_check_db_existence = "SELECT SCHEMA_NAME
+FROM INFORMATION_SCHEMA.SCHEMATA
+WHERE SCHEMA_NAME = '$dbname'";
 
-mysqli_close($link);
-?>
-<!--Create item table-->
-<?php
-$link=mysqli_connect($servername, $username, $password, $dbname);
-$create_item = "CREATE TABLE if not exists $item_table (
-    itemID INT(6) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    sellerEmail VARCHAR(30) NOT NULL,
-    description VARCHAR(30) NOT NULL,
-    title VARCHAR(10) NOT NULL,
-    CONSTRAINT `item_1` FOREIGN KEY (`sellerEmail`) REFERENCES `$user_table` (`email`))
-    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-mysqli_query($link, $create_item);
-  if(mysqli_errno($link)){
-    exit(mysqli_error($link));
-  }
-mysqli_close($link);
-?>
+//if there is no such database, then create one
+if(($conn->query($sql_check_db_existence))->num_rows === 0){
+    // Create database
+    $sql_db = "CREATE DATABASE $dbname";
+    if ($conn->query($sql_db) === TRUE) {
+        echo "Database created successfully.    ";
+    } else {
+        echo "Error creating database: " . $conn->error . ".  ";
+    }
+    $conn->close();
 
-<!--Create category table-->
-<?php
-$link=mysqli_connect($servername, $username, $password, $dbname);
-$create_category = "CREATE TABLE if not exists $category_table (
-    categoryID INT(6) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(30) NOT NULL)
-    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-mysqli_query($link, $create_category);
-  if(mysqli_errno($link)){     //check error!
-    exit(mysqli_error($link));
-  }
-mysqli_close($link);
-?>
+    //Create tables
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    $sql_tables = "CREATE TABLE `User` (
+    `email` varchar(30) NOT NULL,
+    `password` varchar(30) NOT NULL,
+    `role` enum('seller','buyer') NOT NULL,
+    PRIMARY KEY (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE `Item` (
+    `itemID` int(11) NOT NULL AUTO_INCREMENT,
+    `sellerEmail` varchar(30) NOT NULL,
+    `title` varchar(30) NOT NULL,
+    `description` varchar(200) NOT NULL,
+    PRIMARY KEY (`itemID`),
+    KEY `sellerEmail` (`sellerEmail`),
+    CONSTRAINT `item_ibfk_1` FOREIGN KEY (`sellerEmail`) REFERENCES `User` (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE `Category` (
+    `categoryID` int(11) NOT NULL AUTO_INCREMENT,
+    `description` varchar(10) NOT NULL,
+    PRIMARY KEY (`categoryID`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE `BiddingHistory` (
+    `ItemID` int(11) NOT NULL,
+    `buyerEmail` varchar(30) NOT NULL,
+    `biddingTime` datetime NOT NULL,
+    `bidPrice` double NOT NULL,
+    PRIMARY KEY (`ItemID`,`buyerEmail`,`biddingTime`),
+    KEY `buyerEmail` (`buyerEmail`),
+    CONSTRAINT `biddinghistory_ibfk_1` FOREIGN KEY (`ItemID`) REFERENCES `Item` (`itemID`),
+    CONSTRAINT `biddinghistory_ibfk_2` FOREIGN KEY (`buyerEmail`) REFERENCES `User` (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE `WatchList` (
+    `ItemID` int(11) NOT NULL,
+    `BuyerEmail` varchar(30) NOT NULL,
+    PRIMARY KEY (`ItemID`,`BuyerEmail`),
+    KEY `BuyerEmail` (`BuyerEmail`),
+    CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`BuyerEmail`) REFERENCES `User` (`email`),
+    CONSTRAINT `watchlist_ibfk_2` FOREIGN KEY (`ItemID`) REFERENCES `Item` (`itemID`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE `Auction` (
+    `itemID` int(11) NOT NULL,
+    `sellerEmail` varchar(30) NOT NULL,
+    `categoryID` int(11) NOT NULL,
+    `startingPrice` double NOT NULL,
+    `currentPrice` double NOT NULL,
+    `reservePrice` double NOT NULL,
+    `endDate` date NOT NULL,
+    PRIMARY KEY (`itemID`),
+    KEY `sellerEmail` (`sellerEmail`),
+    KEY `categoryID` (`categoryID`),
+    CONSTRAINT `auction_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `Item` (`itemID`),
+    CONSTRAINT `auction_ibfk_2` FOREIGN KEY (`sellerEmail`) REFERENCES `User` (`email`),
+    CONSTRAINT `auction_ibfk_3` FOREIGN KEY (`categoryID`) REFERENCES `Category` (`categoryID`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-<!--Create biddingHistory table-->
-<?php
-$link=mysqli_connect($servername, $username, $password, $dbname);
-$create_bid = "CREATE TABLE if not exists $bid_table (
-    itemID INT(6) NOT NULL ,
-    buyerEmail VARCHAR(30) NOT NULL ,
-    biddingTime datetime NOT NULL ,
-    bidPrice double NOT NULL,
-    PRIMARY KEY(itemID,buyerEmail,biddingTime),
-    CONSTRAINT `bid_1` FOREIGN KEY (`itemID`) REFERENCES `$item_table` (`itemID`),
-    CONSTRAINT `bid_2` FOREIGN KEY (`buyerEmail`) REFERENCES `$user_table` (`email`))
-    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-mysqli_query($link, $create_bid);
-  if(mysqli_errno($link)){     //check error!
-    exit(mysqli_error($link));
-  }
-mysqli_close($link);
-?>
+    if ($conn->multi_query($sql_tables) === TRUE) {
+        echo "Tables created successfully";
+    } else {
+        echo "Error creating tables: " . $conn->error;
+    }
 
-<!--Create watchlist table-->
-<?php
-$link=mysqli_connect($servername, $username, $password, $dbname);
-$create_watchlist = "CREATE TABLE if not exists $watchlist_table (
-    itemID INT(6) NOT NULL,
-    buyerEmail VARCHAR(30) NOT NULL,
-    PRIMARY KEY(itemID, buyerEmail),
-    CONSTRAINT `watch_1` FOREIGN KEY (`BuyerEmail`) REFERENCES `$user_table` (`email`),
-    CONSTRAINT `watch_2` FOREIGN KEY (`ItemID`) REFERENCES `$item_table` (`itemID`))
-    ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-mysqli_query($link, $create_watchlist);
-  if(mysqli_errno($link)){     //check error!
-    exit(mysqli_error($link));
-  }
-mysqli_close($link);
-?>
-
-<!--Create auction table-->
-<?php
-$link=mysqli_connect($servername, $username, $password, $dbname);
-$create_auction = "CREATE TABLE if not exists $auction_table (
-  itemID int(11) NOT NULL PRIMARY KEY,
-  sellerEmail varchar(30) NOT NULL,
-  categoryID int(11) NOT NULL,
-  startingPrice double NOT NULL,
-  currentPrice double NOT NULL,
-  reservePrice double NOT NULL,
-  endDate date NOT NULL,
-  CONSTRAINT `auction_1` FOREIGN KEY (`itemID`) REFERENCES `$item_table` (`itemID`),
-  CONSTRAINT `auction_2` FOREIGN KEY (`sellerEmail`) REFERENCES `$user_table` (`email`),
-  CONSTRAINT `auction_3` FOREIGN KEY (`categoryID`) REFERENCES `$category_table` (`categoryID`))
-  ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-mysqli_query($link, $create_auction);
-  if(mysqli_errno($link)){     //check error!
-    exit(mysqli_error($link));
-  }
-mysqli_close($link);
+    $conn->close();
+}else{
+    $conn->close();
+}
 ?>

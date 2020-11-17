@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php include_once("header.php")?>
 
 <div class="container my-5">
@@ -65,9 +66,9 @@
     $username = $_SESSION['username'];
 
     $sql = "INSERT INTO Item ".
-            "(itemID,title,description,sellerEmail) ".
+            "(title,description,sellerEmail) ".
             "VALUES ".
-            "('$itemID','$title','$description','$username')";
+            "('$title','$description','$username')";
 
     $ins = mysqli_query($con, $sql);
     if(!$ins)

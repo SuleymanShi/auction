@@ -20,6 +20,15 @@
   <link rel="stylesheet" href="css/custom.css">
 
   <title>[My Auction Site] <!--CHANGEME!--></title>
+  <script>
+          function select_change() {       //this method of onchange when you select "other" is from the internet
+              if (document.getElementById("auctionCategory").value == "other") {
+                  document.getElementById("newCategory").style.display = "block";
+              } else {
+                  document.getElementById("newCategory").style.display = "none";
+              }
+          }
+      </script>
 </head>
 
 

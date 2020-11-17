@@ -43,7 +43,7 @@ elseif (empty($_POST['password'])){
 
 //select username and password from database to match
 $link=mysqli_connect($servername,$username,$password,$dbname);
-$query="SELECT * from $user_table where $user_table.email='{$_POST['email']}'";
+$query="SELECT * from user where user.email='{$_POST['email']}'";
 $result=mysqli_query($link,$query);
 $user_data=mysqli_fetch_assoc($result);
 $user_password=$user_data['password'];

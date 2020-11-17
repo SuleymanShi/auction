@@ -41,10 +41,10 @@
           </div>
         </div>
         <div class="form-group row">
-          <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category</label>
+          <label for="auctionCategory"  class="col-sm-2 col-form-label text-right">Category</label>
           <div class="col-sm-10">
-            <select class="form-control" name="auctionCategory" id="auctionCategory" onchange="select_change()">
-              <option selected>Choose...</option>
+            <select class="form-control" name="auctionCate" id="auctionCategory" onchange="select_change()">
+              <option selected name="Choose...">Choose...</option>
               <?php
                   $con = @mysqli_connect('localhost','root','','comp0022',3306);
                   if(mysqli_connect_errno()){
