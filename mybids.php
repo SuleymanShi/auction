@@ -63,8 +63,8 @@
 
   // TODO: Check user's credentials (cookie/session).
   if (!isset($_SESSION['account_type'])  || $_SESSION['logged_in'] != true || $_SESSION['account_type'] != 'buyer') {
-    echo("You have not logged in or are not a buyer. You will be redirected shortly.");
     header('refresh:5;url=browse.php');
+    exit("You have not logged in or are not a buyer. You will be redirected shortly.");
   }
 
   // TODO: Perform a query to pull up the auctions they've bidded on.

@@ -15,8 +15,8 @@
   
   // TODO: Check user's credentials (cookie/session).
   if (!isset($_SESSION['account_type']) || $_SESSION['logged_in'] != true || $_SESSION['account_type'] != 'buyer' ) {
-    echo("You have not logged in or are not a buyer. You will be redirected shortly.");
     header('refresh:5;url=browse.php');
+    exit("You have not logged in or are not a buyer. You will be redirected shortly.");
    }
   // TODO: Perform a query to pull up auctions they might be interested in.
   include_once("connect_database.php");
@@ -46,7 +46,8 @@
                               GROUP BY BiddingHistory.itemID;
                               ";
   $result_auction_interested = $conn->query($sql_auction_interested);
-  echo($username);
+  //test code
+  //echo($username);ß
   
   // TODO: Loop through results and print them out as list items.
   echo($result_auction_interested->num_rows);
