@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "root";
+$password = "";
 $dbname = "comp0022";
 
 // Create connection
@@ -75,6 +75,7 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     `currentPrice` double NOT NULL,
     `reservePrice` double NOT NULL,
     `endDate` date NOT NULL,
+    'newcategoryID' int(11) NOT NULL,
     PRIMARY KEY (`itemID`),
     KEY `sellerEmail` (`sellerEmail`),
     KEY `categoryID` (`categoryID`),

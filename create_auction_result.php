@@ -9,23 +9,13 @@
 /* TODO #1: Connect to MySQL database (perhaps by requiring a file that
             already does this). */
     // $_SESSION['username'] = "test";
-    $sherhold = 100;
-    $newCategoryID = 0;
+    
    
     $con = @mysqli_connect('localhost','root','','comp0022',3306);     //connect to mysql
     if(mysqli_connect_errno()){
         exit(mysqli_connect_error());
     }
     mysqli_set_charset($con,'utf8'); 
-    // $sql = "INSERT INTO Category ".
-    //        "(description) ".
-    //        "VALUES ".
-    //        "('other')";
-    // $ins = mysqli_query($con, $sql);
-    // if(!$ins)
-    // {
-    // exit('Can\'t insert new Category: '.mysqli_error($con));
-    // }
     
     $sql = "CREATE TABLE if not exists `newCategory`(". 
            "`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, ".
@@ -37,6 +27,13 @@
     {
     exit('Can\'t create the table: '.mysqli_error($con));
     }
+
+    /* TODO #2: Extract form data into variables. Because the form was a 'post'
+            form, its data can be accessed via $POST['auctionTitle'], 
+            $POST['auctionDetails'], etc. Perform checking on the data to
+            make sure it can be inserted into the database. If there is an
+            issue, give some semi-helpful feedback to user. */
+
     if($_POST['auctionEndDate']<date("Y-m-d H:i:s")){
       echo"<script>alert('Wrong endDate');history.go(-1);</script>";
     }
@@ -62,7 +59,11 @@
       echo"<script>alert('Please select a certain category');history.go(-1);</script>";
     }
 
+    // update or insert newcategory data into table newcategory 
+
     $auctionCategory = $_POST['auctionCate'];
+    $sherhold = 100;
+    $newCategoryID = 0;
 
     if($_POST['auctionCate']=='other' and $_POST['newCategory']!=''){
       $newCategory = $_POST['newCategory'];
@@ -105,11 +106,12 @@
                }
             }
           }
+    // If the amount of newcategory being used over the sherhold, add the newcategory into category table
 
     $findnum = "select newdescription from newCategory where amount >= $sherhold";
     $resource = mysqli_query($con,$findnum);
-    if(mysqli_num_rows($resource)!=0){
-      while($row = mysqli_fetch_assoc($resource)) {
+    if(mysqli_num_rows($resource)!=0){              //if there is a newcategory amount more than sherhold
+      while($row = mysqli_fetch_assoc($resource)) { //insert it into category table
         $newdes = $row["newdescription"];
         $sql = "INSERT INTO Category ".
                "(description) ".
@@ -130,12 +132,7 @@
          while($row = mysqli_fetch_assoc($sel)) {
           $oldID = $row["newcategoryID"];
         }
-         $sql = "DELETE FROM newCategory where newdescription = \"".$newdes."\"";
-         $del = mysqli_query($con, $sql);
-         if(!$del)
-         {
-         exit('Can\'t delete new Category: '.mysqli_error($con));
-         }
+         
          $findID = "select categoryID from Category where description = \"".$newdes."\"";
          $sel = mysqli_query($con, $findID);
          if(!$sel)
@@ -146,18 +143,25 @@
           $changeID = $row["categoryID"];
         }
          $auctionCategory = $_POST['newCategory'];
-         $change = "update Auction SET CategoryID = $changeID where newcategoryID = \"".$oldID."\";";
-          $cha = mysqli_query($con, $change);
+         $change = "update Auction SET CategoryID = $changeID where newcategoryID = \"".$oldID."\";";//update the auction categoryID 
+          $cha = mysqli_query($con, $change);                                                        //which previously belong to newcategory
          if(!$cha)
          {
           exit('Can\'t add the amount: '.mysqli_error($con));
          };
-         $change = "update Auction SET newcategoryID = 0 where newcategoryID = \"".$oldID."\";";
+         $change = "update Auction SET newcategoryID = 0 where newcategoryID = \"".$oldID."\";";      //update the auction newcategoryID to 0
           $cha = mysqli_query($con, $change);
          if(!$cha)
          {
-          exit('Can\'t add the amount: '.mysqli_error($con));
+          exit('Can\'t change the newcategoryID: '.mysqli_error($con));
          };
+
+         $sql = "DELETE FROM newCategory where newdescription = \"".$newdes."\"";//delete the newcategory
+         $del = mysqli_query($con, $sql);
+         if(!$del)
+         {
+         exit('Can\'t delete new Category: '.mysqli_error($con));
+         }
       }
     }
 
@@ -186,7 +190,7 @@
 
     $username = $_SESSION['username'];
 
-    $sql = "INSERT INTO Item ".
+    $sql = "INSERT INTO Item ".                                //insert the item data
             "(title,description,sellerEmail) ".
             "VALUES ".
             "('$title','$description','$username')";
@@ -217,20 +221,10 @@
     {
       exit('Can\'t save your data of auction: '.mysqli_error($con));
     }
-
-    
+    /* TODO #3: If everything looks good, make the appropriate call to insert
+            data into the database. */  
 
     echo "Successfully save your data<br />";                        //inform users after saving all the data
-
-/* TODO #2: Extract form data into variables. Because the form was a 'post'
-            form, its data can be accessed via $POST['auctionTitle'], 
-            $POST['auctionDetails'], etc. Perform checking on the data to
-            make sure it can be inserted into the database. If there is an
-            issue, give some semi-helpful feedback to user. */
-
-
-/* TODO #3: If everything looks good, make the appropriate call to insert
-            data into the database. */
     mysqli_close($con);
             
 
