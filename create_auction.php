@@ -41,10 +41,10 @@
           </div>
         </div>
         <div class="form-group row">
-          <label for="auctionCategory"  class="col-sm-2 col-form-label text-right">Category</label>
+          <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category</label>
           <div class="col-sm-10">
-            <select class="form-control" name="auctionCate" id="auctionCategory" onchange="select_change()">
-              <option selected name="Choose...">Choose...</option>
+            <select class="form-control" name="auctionCate" id="auctionCate" onchange="select_change()">
+              <option selected>Choose...</option>
               <?php
                   $con = @mysqli_connect('localhost','root','','comp0022',3306);
                   if(mysqli_connect_errno()){
@@ -58,9 +58,8 @@
                   }
                   mysqli_close($con)
               ?>
-              <option value="other">other</option>
             </select>
-            <input type="text" name="newCate" class="form-control" id="newCategory" style="display: none">
+            <input type="text"  name="newCategory" class="form-control" id="newCategory" style="display:none" >
             <small id="categoryHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Select a category for this item.</small>
           </div>
         </div>

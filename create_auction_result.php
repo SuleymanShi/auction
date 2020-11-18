@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php include_once("header.php")?>
 
 <div class="container my-5">
@@ -9,11 +8,46 @@
 
 /* TODO #1: Connect to MySQL database (perhaps by requiring a file that
             already does this). */
+    // $_SESSION['username'] = "test";
+    $sherhold = 100;
+    $newCategoryID = 0;
+
     $con = @mysqli_connect('localhost','root','','comp0022',3306);     //connect to mysql
     if(mysqli_connect_errno()){
         exit(mysqli_connect_error());
     }
     mysqli_set_charset($con,'utf8');
+    // $sql = "INSERT INTO Category ".
+    //        "(description) ".
+    //        "VALUES ".
+    //        "('other')";
+    // $ins = mysqli_query($con, $sql);
+    // if(!$ins)
+    // {
+    // exit('Can\'t insert new Category: '.mysqli_error($con));
+    // }
+
+    $sql = "CREATE TABLE if not exists `newCategory`(".
+           "`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, ".
+           "Primary key(`newcategoryID`)".
+           ")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+    $creates = mysqli_query($con, $sql);
+    if(!$creates)
+    {
+    exit('Can\'t create the table: '.mysqli_error($con));
+    }
+    if($_POST['auctionEndDate']<date("Y-m-d H:i:s")){
+      echo"<script>alert('Wrong endDate');history.go(-1);</script>";
+    }
+
+    if(strlen($_POST['auctionTitle'])==0 or strlen($_POST['auctionDetails'])==0){
+        echo"<script>alert('Please input the title or details');history.go(-1);</script>";
+    }
+
+    if($_POST['auctionStartPrice']==0 or $_POST['auctionReservePrice']==0){
+      echo"<script>alert('Please enter the price');history.go(-1);</script>";
+    }
 
     if(strlen($_POST['auctionTitle'])>30){                           //check the validation of data
         echo"<script>alert('The length of Title overflow(longer than 30)');history.go(-1);</script>";
@@ -28,16 +62,103 @@
       echo"<script>alert('Please select a certain category');history.go(-1);</script>";
     }
 
-    $itemID = 0;                                          //get the itemID from mysql
+    $auctionCategory = $_POST['auctionCate'];
 
-    $find = "select * from auction";
-    if(!mysqli_query($con,$find)){
-        $itemID=1;
-    }else{
-        $max = "select max(itemID) from auction";
-        $resource = mysqli_query($con,$max);
-        $maxID = mysqli_fetch_assoc($resource);
-        $itemID = $maxID['max(itemID)'] + 1;
+    if($_POST['auctionCate']=='other' and $_POST['newCategory']!=''){
+      $newCategory = $_POST['newCategory'];
+      $newcat = "select amount from newCategory where newdescription = \"".$newCategory."\"";
+      $resource = mysqli_query($con,$newcat);
+      if(mysqli_num_rows($resource)!=0){
+        $addcount = "update newCategory SET amount = amount + 50 where newdescription = \"".$newCategory."\";";
+        $add = mysqli_query($con, $addcount);
+        if(!$add)
+        {
+        exit('Can\'t add the amount: '.mysqli_error($con));
+        };
+        $findID = "select newCategoryID from newCategory where newdescription = \"".$newCategory."\"";
+        $resource = mysqli_query($con, $findID);
+        if(!$resource)
+        {
+        exit('Can\'t find the ID: '.mysqli_error($con));
+        };
+        while($row = mysqli_fetch_assoc($resource)) {
+          $newCategoryID = $row["newCategoryID"];
+        }
+
+      }else{$sql = "INSERT INTO newCategory ".
+                  "(newdescription,amount) ".
+                  "VALUES ".
+                  "('$newCategory',1)";
+              $ins = mysqli_query($con, $sql);
+              if(!$ins)
+              {
+              exit('Can\'t insert new Category: '.mysqli_error($con));
+              }
+              $findID = "select newCategoryID from newCategory where newdescription = \"".$newCategory."\"";
+              $resource = mysqli_query($con, $findID);
+               if(!$resource)
+               {
+               exit('Can\'t find the ID: '.mysqli_error($con));
+                };
+               while($row = mysqli_fetch_assoc($resource)) {
+                 $newCategoryID = $row["newCategoryID"];
+               }
+            }
+          }
+
+    $findnum = "select newdescription from newCategory where amount >= $sherhold";
+    $resource = mysqli_query($con,$findnum);
+    if(mysqli_num_rows($resource)!=0){
+      while($row = mysqli_fetch_assoc($resource)) {
+        $newdes = $row["newdescription"];
+        $sql = "INSERT INTO Category ".
+               "(description) ".
+               "VALUES ".
+              "('$newdes')";
+         $ins = mysqli_query($con, $sql);
+         if(!$ins)
+         {
+         exit('Can\'t insert new Category: '.mysqli_error($con));
+         }
+
+         $sql = "SELECT newcategoryID from newcategory where newdescription = \"".$newdes."\"";
+         $sel = mysqli_query($con,$sql);
+         if(!$sel)
+         {
+         exit('Can\'t find the newcateID: '.mysqli_error($con));
+         }
+         while($row = mysqli_fetch_assoc($sel)) {
+          $oldID = $row["newcategoryID"];
+        }
+         $sql = "DELETE FROM newCategory where newdescription = \"".$newdes."\"";
+         $del = mysqli_query($con, $sql);
+         if(!$del)
+         {
+         exit('Can\'t delete new Category: '.mysqli_error($con));
+         }
+         $findID = "select categoryID from Category where description = \"".$newdes."\"";
+         $sel = mysqli_query($con, $findID);
+         if(!$sel)
+         {
+         exit('Can\'t find categoryID: '.mysqli_error($con));
+         }
+         while($row = mysqli_fetch_assoc($sel)) {
+          $changeID = $row["categoryID"];
+        }
+         $auctionCategory = $_POST['newCategory'];
+         $change = "update Auction SET CategoryID = $changeID where newcategoryID = \"".$oldID."\";";
+          $cha = mysqli_query($con, $change);
+         if(!$cha)
+         {
+          exit('Can\'t add the amount: '.mysqli_error($con));
+         };
+         $change = "update Auction SET newcategoryID = 0 where newcategoryID = \"".$oldID."\";";
+          $cha = mysqli_query($con, $change);
+         if(!$cha)
+         {
+          exit('Can\'t add the amount: '.mysqli_error($con));
+         };
+      }
     }
 
     $title = $_POST['auctionTitle'];                       //extract data from users and mysql
@@ -46,7 +167,7 @@
 
     $categoryID = 0;
 
-    $auctionCategory = $_POST['auctionCate'];
+
 
     $cat = "select categoryID from Category where description = \"".$auctionCategory."\"";
     $resource = mysqli_query($con,$cat);
@@ -76,10 +197,20 @@
       exit('Can\'t save your data of item: '.mysqli_error($con));
     }
 
+    $itemID = 0;
+
+    $findID = "select max(itemID) from item";
+
+    $resource = mysqli_query($con,$findID);
+    while($row = mysqli_fetch_assoc($resource)) {
+      $itemID = $row["max(itemID)"];
+    }
+
+
     $sql = "INSERT INTO Auction ".                                //insert all the data into mysql
-            "(itemID,categoryID,startingPrice,currentPrice,reservePrice,endDate,sellerEmail ) ".
+            "(itemID,categoryID,startingPrice,currentPrice,reservePrice,endDate,sellerEmail,newCategoryID ) ".
             "VALUES ".
-            "('$itemID','$categoryID','$startingPrice','$currentPrice','$reservePrice','$endDate','$username')";
+            "('$itemID','$categoryID','$startingPrice','$currentPrice','$reservePrice','$endDate','$username','$newCategoryID')";
 
     $ins = mysqli_query($con, $sql);
     if(!$ins)
