@@ -47,10 +47,9 @@
                               ";
   $result_auction_interested = $conn->query($sql_auction_interested);
   //test code
-  //echo($username);ß
+  //echo($username);
   
   // TODO: Loop through results and print them out as list items.
-  echo($result_auction_interested->num_rows);
   if ($result_auction_interested->num_rows > 0) {
     // output data of each row
     while($row = $result_auction_interested->fetch_assoc()) {

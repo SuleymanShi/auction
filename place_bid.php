@@ -15,11 +15,8 @@ require_once("PHPMailer/POP3.php");
 // TODO: Extract $_POST variables, check they're OK, and attempt to make a bid.
 // Notify user of success/failure and redirect/give navigation options.
 
-//test code
-//session_start();
-//$_SESSION["username"] = "871222456@qq.com";
-//echo($_SESSION["username"]);
 
+session_start();
 $item_id = $_SESSION["item_id"];
 $buyerEmail = $_SESSION["username"];
 $bid = $_POST["bid"];
@@ -28,6 +25,7 @@ $sql_highest_bid = "SELECT currentPrice FROM Auction Where itemID = $item_id";
 $result_highest_bid = $conn->query($sql_highest_bid);
 $row_highest_bid = $result_highest_bid->fetch_assoc();
 $highest_bid = $row_highest_bid["currentPrice"];
+
 ?>
 
 <?php if ($bid <= $highest_bid): ?>
@@ -45,7 +43,7 @@ $highest_bid = $row_highest_bid["currentPrice"];
     //send emails to other bidders to tell them they have been outbidden.
     $sql_select_item="SELECT title, `description` FROM Item WHERE itemID = $item_id;" ;
     $row_select_item = ($conn->query($sql_select_item))->fetch_assoc();
-    $sql_select_bidding_history="SELECT buyerEmail FROM BiddingHistory WHERE itemID=$item_id";
+    $sql_select_bidding_history="SELECT buyerEmail FROM BiddingHistory WHERE itemID=$item_id GROUP BY buyerEmail";
     $result_select_bidding_history = $conn->query($sql_select_bidding_history);
     if ($result_select_bidding_history->num_rows > 0) {
         // send emails

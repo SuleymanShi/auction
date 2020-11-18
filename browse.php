@@ -1,5 +1,38 @@
 <?php include_once("header.php")?>
-<?php include_once("create_database.php")?> <!--Create a database if there is none-->
+<?php include_once("create_database.php")?>
+<?php 
+// Create connection again
+$conn = new mysqli($servername, $username, $password,$dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
+$sql_check_category = "SELECT * FROM Category;";
+$result_check_category = $conn->query($sql_check_category);
+$nums_of_category = $result_check_category->num_rows;
+echo("  ".$nums_of_category."  ");
+if($nums_of_category == 0){
+    // add data to Catergory
+    $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
+    for($i = 0; $i < count($default_category); $i ++){
+        $temp = $default_category[$i];
+        $sql = "INSERT INTO Category ".
+        "(description) ".
+        "VALUES ".
+        "('$temp')";
+        echo($sql);
+        $ins = $conn->query($sql);
+        if(!$ins)
+        {
+        exit('Can\'t insert new Category: '.mysqli_error($conn));
+        }
+    }
+}
+
+$conn->close();
+
+?>
+<?php include_once("addCategory.php")?>
 <?php require("utilities.php")?>
 
 <div class="container">
@@ -21,25 +54,35 @@
               <i class="fa fa-search"></i>
             </span>
           </div>
-          <input type="text" class="form-control border-left-0" id="keyword" placeholder="Search for anything">
+          <input type="text" class="form-control border-left-0" name="keyword" placeholder="Search for anything">
         </div>
       </div>
     </div>
     <div class="col-md-3 pr-0">
       <div class="form-group">
         <label for="cat" class="sr-only">Search within:</label>
-        <select class="form-control" id="cat">
+        <select class="form-control" name="cat">
           <option selected value="all">All categories</option>
-          <option value="fill">Fill me in</option>
-          <option value="with">with options</option>
-          <option value="populated">populated from a database?</option>
+          <?php
+          $con = new mysqli("localhost", "root", "", "comp0022");
+          // Check connection
+          if ($con->connect_error) {
+            die("Connection failed: " . $con->connect_error);
+          } 
+          $sql = "select description from Category order by description ASC";
+          $resource = mysqli_query($con,$sql);
+          while($row = mysqli_fetch_assoc($resource)) {
+            echo "<option value ='".$row['description']."'>".$row['description']."</option>";;
+          }
+          mysqli_close($con)
+          ?>
         </select>
       </div>
     </div>
     <div class="col-md-3 pr-0">
       <div class="form-inline">
         <label class="mx-2" for="order_by">Sort by:</label>
-        <select class="form-control" id="order_by">
+        <select class="form-control" name="order_by">
           <option selected value="pricelow">Price (low to high)</option>
           <option value="pricehigh">Price (high to low)</option>
           <option value="date">Soonest expiry</option>
@@ -59,26 +102,41 @@
 <?php
   // Retrieve these from the URL
   if (!isset($_GET['keyword'])) {
-    // TODO: Define behavior if a keyword has not been specified.
+    $keyword = "";
   }
   else {
     $keyword = $_GET['keyword'];
   }
 
   if (!isset($_GET['cat'])) {
-    // TODO: Define behavior if a category has not been specified.
+    $sql_category = " ";
   }
   else {
     $category = $_GET['cat'];
+    if ($category == "all"){
+      $sql_category = " ";
+    }
+    else{
+      $sql_category = " and categoryID = (select categoryID from category where description = '$category')";
+    }
   }
-
+  
   if (!isset($_GET['order_by'])) {
-    // TODO: Define behavior if an order_by value has not been specified.
+    $sql_ordering = " order by currentPrice ASC";
   }
   else {
     $ordering = $_GET['order_by'];
+    if ($ordering == "pricelow"){
+      $sql_ordering = " order by currentPrice ASC";
+    }
+    elseif ($ordering == "pricehigh"){
+      $sql_ordering = " order by currentPrice DESC";
+    }
+    elseif ($ordering == "date"){
+      $sql_ordering = " order by endDate ASC";
+    }
   }
-
+  
   if (!isset($_GET['page'])) {
     $curr_page = 1;
   }
@@ -86,54 +144,70 @@
     $curr_page = $_GET['page'];
   }
 
-  /* TODO: Use above values to construct a query. Use this query to
-     retrieve data from the database. (If there is no form data entered,
-     decide on appropriate default value/default query to make. */
+  $con = new mysqli("localhost", "root", "", "comp0022");
+  // Check connection
+  if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+  } 
 
-  /* For the purposes of pagination, it would also be helpful to know the
-     total number of results that satisfy the above query */
-  $num_results = 96; // TODO: Calculate me for real
+  $sql_select = "SELECT auction.itemID,title,description,currentPrice,endDate,num.num_bids
+                  FROM auction 
+                  LEFT JOIN item on auction.itemID = item.itemID and auction.sellerEmail = item.sellerEmail 
+                  LEFT JOIN (SELECT BiddingHistory.itemID, COUNT(*) AS num_bids 
+                        FROM BiddingHistory 
+                        GROUP BY BiddingHistory.itemID) AS num
+                  ON num.itemID = auction.itemID
+                  WHERE (title like '%$keyword%' or description like '%$keyword%')";
+  $result1 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering); 
+  $num_results = mysqli_num_rows($result1);
   $results_per_page = 10;
   $max_page = ceil($num_results / $results_per_page);
+  $min_limit = ($curr_page - 1) * $results_per_page;
+  $max_limit = $curr_page * $results_per_page;
+  $sql_limit = " limit $min_limit, $max_limit";
+  mysqli_close($con);
 ?>
 
 <div class="container mt-5">
 
-<!-- TODO: If result set is empty, print an informative message. Otherwise... -->
-
-<ul class="list-group">
-
-<!-- TODO: Use a while loop to print a list item for each auction listing
-     retrieved from the query -->
-
 <?php
-  // Demonstration of what listings will look like using dummy data.
-  $item_id = "87021";
-  $title = "Dummy title";
-  $description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eget rutrum ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus feugiat, ipsum vel egestas elementum, sem mi vestibulum eros, et facilisis dui nisi eget metus. In non elit felis. Ut lacus sem, pulvinar ultricies pretium sed, viverra ac sapien. Vivamus condimentum aliquam rutrum. Phasellus iaculis faucibus pellentesque. Sed sem urna, maximus vitae cursus id, malesuada nec lectus. Vestibulum scelerisque vulputate elit ut laoreet. Praesent vitae orci sed metus varius posuere sagittis non mi.";
-  $current_price = 30;
-  $num_bids = 1;
-  $end_date = new DateTime('2020-09-16T11:00:00');
+  $con = new mysqli("localhost", "root", "", "comp0022");
+  // Check connection
+  if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+  } 
+  $result2 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering.$sql_limit);
 
-  // This uses a function defined in utilities.php
-  print_listing_li($item_id, $title, $description, $current_price, $num_bids, $end_date);
-
-  $item_id = "516";
-  $title = "Different title";
-  $description = "Very short description.";
-  $current_price = 13.50;
-  $num_bids = 3;
-  $end_date = new DateTime('2020-11-02T00:00:00');
-
-  print_listing_li($item_id, $title, $description, $current_price, $num_bids, $end_date);
+  if (mysqli_num_rows($result2) == 0){
+    echo('
+    <h2>
+      Don\'t get any results.
+    </h2>
+  ' );
+  }
+  else{
+    echo '<ul class="list-group">';
+    while($row = mysqli_fetch_assoc($result2)){
+      $num_bids = $row["num_bids"];
+      if($num_bids === NULL){
+        $num_bids = 0;
+      }
+      $end_date = new DateTime($row["endDate"]);
+      print_listing_li($row["itemID"], $row["title"], $row["description"], $row["currentPrice"], $num_bids, $end_date);
+    }
+    echo '</ul>';
+  }
+  mysqli_close($con);
 ?>
+
+
 
 </ul>
 
 <!-- Pagination for results listings -->
 <nav aria-label="Search results pages" class="mt-5">
   <ul class="pagination justify-content-center">
-
+  
 <?php
 
   // Copy any currently-set GET variables to the URL.
@@ -143,12 +217,12 @@
       $querystring .= "$key=$value&amp;";
     }
   }
-
+  
   $high_page_boost = max(3 - $curr_page, 0);
   $low_page_boost = max(2 - ($max_page - $curr_page), 0);
   $low_page = max(1, $curr_page - 2 - $low_page_boost);
   $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
-
+  
   if ($curr_page != 1) {
     echo('
     <li class="page-item">
@@ -158,7 +232,7 @@
       </a>
     </li>');
   }
-
+    
   for ($i = $low_page; $i <= $high_page; $i++) {
     if ($i == $curr_page) {
       // Highlight the link
@@ -170,13 +244,13 @@
       echo('
     <li class="page-item">');
     }
-
+    
     // Do this in any case
     echo('
       <a class="page-link" href="browse.php?' . $querystring . 'page=' . $i . '">' . $i . '</a>
     </li>');
   }
-
+  
   if ($curr_page != $max_page) {
     echo('
     <li class="page-item">

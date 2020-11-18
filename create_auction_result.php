@@ -17,27 +17,6 @@
         exit(mysqli_connect_error());
     }
     mysqli_set_charset($con,'utf8');
-    // $sql = "INSERT INTO Category ".
-    //        "(description) ".
-    //        "VALUES ".
-    //        "('other')";
-    // $ins = mysqli_query($con, $sql);
-    // if(!$ins)
-    // {
-    // exit('Can\'t insert new Category: '.mysqli_error($con));
-    // }
-
-    $sql = "CREATE TABLE if not exists `newCategory`(".
-           "`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, ".
-           "Primary key(`newcategoryID`)".
-           ")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-
-    $creates = mysqli_query($con, $sql);
-    if(!$creates)
-    {
-    exit('Can\'t create the table: '.mysqli_error($con));
-    }
-
 
     if($_POST['auctionEndDate']<date("Y-m-d H:i:s")){
       echo"<script>alert('Wrong endDate');history.go(-1);</script>";

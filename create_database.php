@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = '';
-$dbname = "comp0022";
+$dbname = "comp0023";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password);
@@ -46,7 +46,7 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     CREATE TABLE `Category` (
     `categoryID` int(11) NOT NULL AUTO_INCREMENT,
-    `description` varchar(10) NOT NULL,
+    `description` varchar(30) NOT NULL,
     PRIMARY KEY (`categoryID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     CREATE TABLE `BiddingHistory` (
@@ -82,15 +82,17 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     CONSTRAINT `auction_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `Item` (`itemID`),
     CONSTRAINT `auction_ibfk_2` FOREIGN KEY (`sellerEmail`) REFERENCES `User` (`email`),
     CONSTRAINT `auction_ibfk_3` FOREIGN KEY (`categoryID`) REFERENCES `Category` (`categoryID`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE if not exists `newCategory`(".
+    "`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, ".
+    "Primary key(`newcategoryID`)".
+    ")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
     if ($conn->multi_query($sql_tables) === TRUE) {
         echo "Tables created successfully";
     } else {
         echo "Error creating tables: " . $conn->error;
     }
-
-    $conn->close();
 }else{
     $conn->close();
 }
