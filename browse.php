@@ -76,11 +76,16 @@
   }
 
   if (!isset($_GET['cat'])) {
-    $sql_category = "";
+    $sql_category = " ";
   }
   else {
     $category = $_GET['cat'];
-    $sql_category = " and categoryID = (select categoryID from category where description = '$category')";
+    if ($category = "all"){
+      $sql_category = " ";
+    }
+    else{
+      $sql_category = " and categoryID = (select categoryID from category where description = '$category')";
+    }
   }
   
   if (!isset($_GET['order_by'])) {
@@ -113,7 +118,6 @@
   } 
 
   $sql_select = "select auction.itemID,title,description,currentPrice,endDate,numBid from auction join item on auction.itemID = item.itemID and auction.sellerEmail = item.sellerEmail where (title like '%$keyword%' or description like '%$keyword%')";
-  $sql = "select description from Category order by description ASC";
   $result1 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering); 
   $num_results = mysqli_num_rows($result1);
   $results_per_page = 10;
@@ -121,6 +125,7 @@
   $min_limit = ($curr_page - 1) * $results_per_page;
   $max_limit = $curr_page * $results_per_page;
   $sql_limit = " limit $min_limit, $max_limit";
+  echo "$sql_select.$sql_category.$sql_ordering";
   mysqli_close($con);
 ?>
 
