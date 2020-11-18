@@ -54,7 +54,7 @@
                   $sql = "select description from Category order by description ASC";
                   $resource = mysqli_query($con,$sql);
                   while($row = mysqli_fetch_assoc($resource)) {
-                    echo "<option value ='".$row['description']."'>".$row['description']."</option>";;
+                    echo "<option value ='".$row['description']."'>".$row['description']."</option>";
                   }
                   mysqli_close($con)
               ?>

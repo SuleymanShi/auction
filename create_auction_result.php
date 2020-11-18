@@ -37,6 +37,8 @@
     {
     exit('Can\'t create the table: '.mysqli_error($con));
     }
+
+
     if($_POST['auctionEndDate']<date("Y-m-d H:i:s")){
       echo"<script>alert('Wrong endDate');history.go(-1);</script>";
     }
@@ -218,9 +220,7 @@
       exit('Can\'t save your data of auction: '.mysqli_error($con));
     }
 
-
-
-    echo "Successfully save your data<br />";                        //inform users after saving all the data
+                   //inform users after saving all the data
 
 /* TODO #2: Extract form data into variables. Because the form was a 'post'
             form, its data can be accessed via $POST['auctionTitle'],
@@ -235,9 +235,7 @@
 
 
 // If all is successful, let user know.
-echo('<div class="text-center">Auction successfully created! <a href="FIXME">View your new listing.</a></div>');
-
-
+echo('<div class="text-center">Auction successfully created! <a href="mylistings.php">View your new listing.</a></div>');
 
 ?>
 

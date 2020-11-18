@@ -75,6 +75,7 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     CREATE TABLE `Auction` (
     `itemID` int(11) NOT NULL,
     `sellerEmail` varchar(30) NOT NULL,
+    `newcategoryID` int(11) NOT NULL,
     `categoryID` int(11) NOT NULL,
     `startingPrice` double NOT NULL,
     `currentPrice` double NOT NULL,
