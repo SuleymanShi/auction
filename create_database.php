@@ -1,7 +1,11 @@
 <?php
 $servername = "localhost";
 $username = "root";
+<<<<<<< HEAD
 $password = "";
+=======
+$password = '';
+>>>>>>> 8c8df9eb94dfce95875f6cf84d1e02f90ab3fe61
 $dbname = "comp0022";
 $user_table="user";
 $item_table="Item";

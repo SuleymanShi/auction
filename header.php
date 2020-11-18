@@ -4,6 +4,11 @@
   // ONLY after the user's login credentials have been verified via a
   // database query.
   session_start();
+<<<<<<< HEAD
+=======
+  $_SESSION['logged_in'] = false;
+  $_SESSION['account_type'] = 'buyer';
+>>>>>>> 8c8df9eb94dfce95875f6cf84d1e02f90ab3fe61
 ?>
 
 <!doctype html>
