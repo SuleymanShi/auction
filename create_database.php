@@ -77,7 +77,7 @@ if($databse_num === 0){
     `categoryID` int(11) NOT NULL,
     `startingPrice` double NOT NULL,
     `currentPrice` double NOT NULL,
-    `reservePrice` double NOT NULL,
+    `reservePrice` double NULL,
     `endDate` datetime NOT NULL,
     PRIMARY KEY (`itemID`),
     KEY `sellerEmail` (`sellerEmail`),
