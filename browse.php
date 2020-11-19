@@ -1,9 +1,6 @@
 <?php include_once("header.php")?>
 <?php include_once("create_database.php");
-
-$conn->close();
 ?>
-<?php include_once("addCategory.php")?>
 <?php require("utilities.php")?>
 
 <div class="container">
