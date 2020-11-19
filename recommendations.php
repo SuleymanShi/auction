@@ -21,6 +21,7 @@
   // TODO: Perform a query to pull up auctions they might be interested in.
   include_once("connect_database.php");
   $username = $_SESSION['username'];
+  $now_time = ((new DateTime())->format('Y-m-d H:i:s'));
   $sql_auction_interested =  "SELECT BiddingHistory.itemID, Item.title, Item.description, Auction.currentPrice,
                               Auction.endDate, num.num_bids 
                               FROM BiddingHistory 
@@ -43,6 +44,8 @@
                                                                    GROUP BY itemID
                                                                   )
                                     )
+                                    AND
+                                    Auction.endDate > '$now_time'
                               GROUP BY BiddingHistory.itemID;
                               ";
   $result_auction_interested = $conn->query($sql_auction_interested);
@@ -53,7 +56,8 @@
   if ($result_auction_interested->num_rows > 0) {
     // output data of each row
     while($row = $result_auction_interested->fetch_assoc()) {
-      print_listing_li($row["itemID"], $row["title"], $row["description"], $row["currentPrice"], $row["num_bids"],$row["endDate"]);
+      $end_date = new DateTime($row["endDate"]);
+      print_listing_li($row["itemID"], $row["title"], $row["description"], $row["currentPrice"], $row["num_bids"],$end_date);
     }
   } else {
     echo "Sorry, no recommendation founded.";

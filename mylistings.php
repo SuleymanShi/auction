@@ -4,7 +4,6 @@
 <div class="container">
 
 <h2 class="my-3">My listings</h2>
-
 <?php
   // This page is for showing a user the auction listings they've made.
   // It will be pretty similar to browse.php, except there is no search bar.
@@ -50,8 +49,7 @@
   
   //connect to database.
   include_once("connect_database.php");
-  //for test
-  //$_SESSION['username'] = '871222456@qq.com';
+
   $username = $_SESSION['username'];
 
 
@@ -61,13 +59,12 @@
   WHERE sellerEmail = '$username';";
   $result = $conn->query($sql_number_of_items);
   $row = $result->fetch_assoc();
- 
   
   /* For the purposes of pagination, it would also be helpful to know the
   total number of results that satisfy the above query */
 
   $num_results = $row["number_of_items"]; // TODO: Calculate me for real
-  $results_per_page = 1;
+  $results_per_page = 10;
   $max_page = ceil($num_results / $results_per_page);
 
 
