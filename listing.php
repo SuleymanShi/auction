@@ -4,7 +4,7 @@
 <?php
   // Get info from the URL:
   $item_id = $_GET['item_id'];
-
+  session_start();
   // TODO: Use item_id to make a query to the database.
   include_once("connect_database.php");
   $sql_auction = "SELECT Item.title, Item.description, Auction.currentPrice, Auction.reservePrice, Auction.endDate
@@ -118,15 +118,17 @@
     <!-- Pass item_id variable to place_bid.php-->
     <?php $_SESSION["item_id"] = $item_id ?>
     <!-- Bidding form -->
-    <form method="POST" action="place_bid.php">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">£</span>
-        </div>
-      <input type="number" class="form-control" id="bid" name="bid">
-      </div>
-      <button type="submit" class="btn btn-primary form-control">Place bid</button>
-    </form>
+    <?php if ($_SESSION['account_type'] === 'buyer'): ?>
+        <form method="POST" action="place_bid.php">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">£</span>
+            </div>
+          <input type="number" class="form-control" id="bid" name="bid">
+          </div>
+          <button type="submit" class="btn btn-primary form-control">Place bid</button>
+        </form>
+      <?php endif ?>
 <?php endif ?>
 
   

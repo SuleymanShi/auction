@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = '';
-$dbname = "comp0023";
+$dbname = "comp0022";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password);
@@ -15,10 +15,13 @@ if ($conn->connect_error) {
 $sql_check_db_existence = "SELECT SCHEMA_NAME
 FROM INFORMATION_SCHEMA.SCHEMATA
 WHERE SCHEMA_NAME = '$dbname'";
+$databse_num = ($conn->query($sql_check_db_existence))->num_rows;
+$conn->close();
 
 //if there is no such database, then create one
-if(($conn->query($sql_check_db_existence))->num_rows === 0){
+if($databse_num === 0){
     // Create database
+    $conn = new mysqli($servername, $username, $password);
     $sql_db = "CREATE DATABASE $dbname";
     if ($conn->query($sql_db) === TRUE) {
         echo "Database created successfully.    ";
@@ -75,7 +78,7 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     `startingPrice` double NOT NULL,
     `currentPrice` double NOT NULL,
     `reservePrice` double NOT NULL,
-    `endDate` date NOT NULL,
+    `endDate` datetime NOT NULL,
     PRIMARY KEY (`itemID`),
     KEY `sellerEmail` (`sellerEmail`),
     KEY `categoryID` (`categoryID`),
@@ -83,17 +86,23 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     CONSTRAINT `auction_ibfk_2` FOREIGN KEY (`sellerEmail`) REFERENCES `User` (`email`),
     CONSTRAINT `auction_ibfk_3` FOREIGN KEY (`categoryID`) REFERENCES `Category` (`categoryID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-    CREATE TABLE if not exists `newCategory`(".
-    "`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, ".
-    "Primary key(`newcategoryID`)".
-    ")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-
-    if ($conn->multi_query($sql_tables) === TRUE) {
+    CREATE TABLE if not exists `newCategory`(`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, Primary key(`newcategoryID`))ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
+    $sql_insert_category = "";
+    for($i = 0; $i < count($default_category); $i ++){
+        $temp = $default_category[$i];
+        $sql = "INSERT INTO Category ".
+        "(description) ".
+        "VALUES ".
+        "('$temp');";
+        $sql_insert_category = $sql_insert_category . $sql;
+    }
+    $sql_tables_insert_category = $sql_tables . $sql_insert_category;
+    if ($conn->multi_query($sql_tables_insert_category) === TRUE) {
         echo "Tables created successfully";
     } else {
         echo "Error creating tables: " . $conn->error;
     }
-}else{
     $conn->close();
 }
 ?>

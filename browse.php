@@ -1,36 +1,7 @@
 <?php include_once("header.php")?>
-<?php include_once("create_database.php")?>
-<?php 
-// Create connection again
-$conn = new mysqli($servername, $username, $password,$dbname);
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
-$sql_check_category = "SELECT * FROM Category;";
-$result_check_category = $conn->query($sql_check_category);
-$nums_of_category = $result_check_category->num_rows;
-echo("  ".$nums_of_category."  ");
-if($nums_of_category == 0){
-    // add data to Catergory
-    $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
-    for($i = 0; $i < count($default_category); $i ++){
-        $temp = $default_category[$i];
-        $sql = "INSERT INTO Category ".
-        "(description) ".
-        "VALUES ".
-        "('$temp')";
-        echo($sql);
-        $ins = $conn->query($sql);
-        if(!$ins)
-        {
-        exit('Can\'t insert new Category: '.mysqli_error($conn));
-        }
-    }
-}
+<?php include_once("create_database.php");
 
 $conn->close();
-
 ?>
 <?php include_once("addCategory.php")?>
 <?php require("utilities.php")?>
