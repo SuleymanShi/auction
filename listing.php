@@ -6,13 +6,25 @@
   $item_id = $_GET['item_id'];
 
   // TODO: Use item_id to make a query to the database.
+  include_once("connect_database.php");
+  $sql_auction = "SELECT Item.title, Item.description, Auction.currentPrice, Auction.reservePrice, Auction.endDate
+                  FROM Auction 
+                  LEFT JOIN Item ON Item.itemID = Auction.itemID
+                  WHERE Auction.itemID = $item_id;";
+  $result_auction = $conn->query($sql_auction);
+  $row_auction = $result_auction->fetch_assoc();
 
-  // DELETEME: For now, using placeholder data.
-  $title = "Placeholder title";
-  $description = "Description blah blah blah";
-  $current_price = 30.50;
-  $num_bids = 1;
-  $end_time = new DateTime('2020-11-02T00:00:00');
+  $sql_num_of_bids = "SELECT BiddingHistory.itemID, COUNT(*) AS num_bids 
+  FROM BiddingHistory 
+  GROUP BY BiddingHistory.itemID";
+  $result_num_of_bids = $conn->query($sql_num_of_bids);
+  $row_num_of_bids = $result_num_of_bids->fetch_assoc();
+  //fetch needed attributes
+  $title = $row_auction["title"];
+  $description = $row_auction["description"];
+  $current_price = $row_auction["currentPrice"];
+  $num_bids = $row_num_of_bids["num_bids"];
+  $end_time = new DateTime($row_auction["endDate"]);
 
   // TODO: Note: Auctions that have ended may pull a different set of data,
   //       like whether the auction ended in a sale or was cancelled due
@@ -20,7 +32,6 @@
   
   // Calculate time to auction end:
   $now = new DateTime();
-  
   if ($now < $end_time) {
     $time_to_end = date_diff($now, $end_time);
     $time_remaining = ' (in ' . display_time_remaining($time_to_end) . ')';
@@ -29,8 +40,15 @@
   // TODO: If the user has a session, use it to make a query to the database
   //       to determine if the user is already watching this item.
   //       For now, this is hardcoded.
-  $has_session = true;
-  $watching = false;
+  $has_session = $_SESSION['logged_in'];
+  $sql_watchList = "SELECT * FROM WatchList WHERE itemID = $item_id AND buyerEmail = '$_SESSION[username]';";
+  $result_watchList = $conn->query($sql_watchList);
+  if($has_session && $result_watchList->num_rows > 0) {
+      $watching = true;
+    }else{
+      $watching = false;
+    }
+  
 ?>
 
 
@@ -72,17 +90,40 @@
 <?php if ($now > $end_time): ?>
      This auction ended <?php echo(date_format($end_time, 'j M H:i')) ?>
      <!-- TODO: Print the result of the auction here? -->
+     <?php
+     $sql_bidding_history = "SELECT buyerEmail, bidPrice 
+                                    FROM BiddingHistory 
+                                    WHERE bidPrice = (SELECT MAX(bidPrice) FROM BiddingHistory WHERE itemID = $item_id);";
+          $result_bidding_history = $conn->query($sql_bidding_history);
+          $row_bidding_history = $result_bidding_history->fetch_assoc();
+
+          if($result_bidding_history->num_rows >0){
+            if($row_auction["reservePrice"] > 0 ){
+              if($row_bidding_history["bidPrice"] >= $row_auction["reservePrice"]){
+                echo("Congratulateions! User ". $row_bidding_history["buyerEmail"]. " has won this item!". " The final bid price is ".$row_bidding_history["bidPrice"]);
+              }
+              else{
+                echo("The top bid has not reached the reserve price. This item is passed in.");
+              }
+            }else{
+              echo("Congratulateions! User". $row_bidding_history["buyerEmail"]. " has won this item!". " The final bid price is ".$row_bidding_history["bidPrice"]);
+            }
+          }else{
+            echo("Nobody bid on this item before end date. This item is passed in.");
+          }
+      ?>
 <?php else: ?>
      Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p>  
     <p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
-
+    <!-- Pass item_id variable to place_bid.php-->
+    <?php $_SESSION["item_id"] = $item_id ?>
     <!-- Bidding form -->
     <form method="POST" action="place_bid.php">
       <div class="input-group">
         <div class="input-group-prepend">
           <span class="input-group-text">£</span>
         </div>
-	    <input type="number" class="form-control" id="bid">
+      <input type="number" class="form-control" id="bid" name="bid">
       </div>
       <button type="submit" class="btn btn-primary form-control">Place bid</button>
     </form>

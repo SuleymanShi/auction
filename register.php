@@ -22,21 +22,21 @@
   <div class="form-group row">
     <label for="email" class="col-sm-2 col-form-label text-right">Email</label>
 	<div class="col-sm-10">
-      <input type="text" class="form-control" id="email" placeholder="Email">
+      <input type="text" class="form-control" name="email" id="email" placeholder="Email">
       <small id="emailHelp" class="form-text text-muted"><span class="text-danger">* Required.</span></small>
 	</div>
   </div>
   <div class="form-group row">
     <label for="password" class="col-sm-2 col-form-label text-right">Password</label>
     <div class="col-sm-10">
-      <input type="password" class="form-control" id="password" placeholder="Password">
+      <input type="password" class="form-control" name="password" id="password" placeholder="Password">
       <small id="passwordHelp" class="form-text text-muted"><span class="text-danger">* Required.</span></small>
     </div>
   </div>
   <div class="form-group row">
     <label for="passwordConfirmation" class="col-sm-2 col-form-label text-right">Repeat password</label>
     <div class="col-sm-10">
-      <input type="password" class="form-control" id="passwordConfirmation" placeholder="Enter password again">
+      <input type="password" class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="Enter password again">
       <small id="passwordConfirmationHelp" class="form-text text-muted"><span class="text-danger">* Required.</span></small>
     </div>
   </div>
