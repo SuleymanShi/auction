@@ -1,38 +1,7 @@
 <?php include_once("header.php")?>
 <?php include_once("create_database.php")?>
-<?php 
-// Create connection again
-$conn = new mysqli($servername, $username, $password,$dbname);
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
-$sql_check_category = "SELECT * FROM Category;";
-$result_check_category = $conn->query($sql_check_category);
-$nums_of_category = $result_check_category->num_rows;
-echo("  ".$nums_of_category."  ");
-if($nums_of_category == 0){
-    // add data to Catergory
-    $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
-    for($i = 0; $i < count($default_category); $i ++){
-        $temp = $default_category[$i];
-        $sql = "INSERT INTO Category ".
-        "(description) ".
-        "VALUES ".
-        "('$temp')";
-        echo($sql);
-        $ins = $conn->query($sql);
-        if(!$ins)
-        {
-        exit('Can\'t insert new Category: '.mysqli_error($conn));
-        }
-    }
-}
 
-$conn->close();
 
-?>
-<?php include_once("addCategory.php")?>
 <?php require("utilities.php")?>
 
 <div class="container">
@@ -68,7 +37,7 @@ $conn->close();
           // Check connection
           if ($con->connect_error) {
             die("Connection failed: " . $con->connect_error);
-          } 
+          }
           $sql = "select description from Category order by description ASC";
           $resource = mysqli_query($con,$sql);
           while($row = mysqli_fetch_assoc($resource)) {
@@ -120,7 +89,7 @@ $conn->close();
       $sql_category = " and categoryID = (select categoryID from category where description = '$category')";
     }
   }
-  
+
   if (!isset($_GET['order_by'])) {
     $sql_ordering = " order by currentPrice ASC";
   }
@@ -136,7 +105,7 @@ $conn->close();
       $sql_ordering = " order by endDate ASC";
     }
   }
-  
+
   if (!isset($_GET['page'])) {
     $curr_page = 1;
   }
@@ -148,17 +117,17 @@ $conn->close();
   // Check connection
   if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
-  } 
+  }
 
   $sql_select = "SELECT auction.itemID,title,description,currentPrice,endDate,num.num_bids
-                  FROM auction 
-                  LEFT JOIN item on auction.itemID = item.itemID and auction.sellerEmail = item.sellerEmail 
-                  LEFT JOIN (SELECT BiddingHistory.itemID, COUNT(*) AS num_bids 
-                        FROM BiddingHistory 
+                  FROM auction
+                  LEFT JOIN item on auction.itemID = item.itemID and auction.sellerEmail = item.sellerEmail
+                  LEFT JOIN (SELECT BiddingHistory.itemID, COUNT(*) AS num_bids
+                        FROM BiddingHistory
                         GROUP BY BiddingHistory.itemID) AS num
                   ON num.itemID = auction.itemID
                   WHERE (title like '%$keyword%' or description like '%$keyword%')";
-  $result1 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering); 
+  $result1 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering);
   $num_results = mysqli_num_rows($result1);
   $results_per_page = 10;
   $max_page = ceil($num_results / $results_per_page);
@@ -175,7 +144,7 @@ $conn->close();
   // Check connection
   if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
-  } 
+  }
   $result2 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering.$sql_limit);
 
   if (mysqli_num_rows($result2) == 0){
@@ -207,7 +176,7 @@ $conn->close();
 <!-- Pagination for results listings -->
 <nav aria-label="Search results pages" class="mt-5">
   <ul class="pagination justify-content-center">
-  
+
 <?php
 
   // Copy any currently-set GET variables to the URL.
@@ -217,12 +186,12 @@ $conn->close();
       $querystring .= "$key=$value&amp;";
     }
   }
-  
+
   $high_page_boost = max(3 - $curr_page, 0);
   $low_page_boost = max(2 - ($max_page - $curr_page), 0);
   $low_page = max(1, $curr_page - 2 - $low_page_boost);
   $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
-  
+
   if ($curr_page != 1) {
     echo('
     <li class="page-item">
@@ -232,7 +201,7 @@ $conn->close();
       </a>
     </li>');
   }
-    
+
   for ($i = $low_page; $i <= $high_page; $i++) {
     if ($i == $curr_page) {
       // Highlight the link
@@ -244,13 +213,13 @@ $conn->close();
       echo('
     <li class="page-item">');
     }
-    
+
     // Do this in any case
     echo('
       <a class="page-link" href="browse.php?' . $querystring . 'page=' . $i . '">' . $i . '</a>
     </li>');
   }
-  
+
   if ($curr_page != $max_page) {
     echo('
     <li class="page-item">

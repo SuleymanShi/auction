@@ -50,7 +50,7 @@
       $newcat = "select amount from newCategory where newdescription = \"".$newCategory."\"";
       $resource = mysqli_query($con,$newcat);
       if(mysqli_num_rows($resource)!=0){
-        $addcount = "update newCategory SET amount = amount + 50 where newdescription = \"".$newCategory."\";";
+        $addcount = "update newCategory SET amount = amount + 1 where newdescription = \"".$newCategory."\";";
         $add = mysqli_query($con, $addcount);
         if(!$add)
         {

@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = '';
-$dbname = "comp0023";
+$dbname = "comp0022";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password);
@@ -87,13 +87,72 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     "`newcategoryID` int(11) NOT NULL AUTO_INCREMENT,`newdescription` varchar(10) NOT NULL,`amount` int(11) NOT NULL, ".
     "Primary key(`newcategoryID`)".
     ")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-
     if ($conn->multi_query($sql_tables) === TRUE) {
-        echo "Tables created successfully";
+            echo "Tables created successfully";
     } else {
         echo "Error creating tables: " . $conn->error;
     }
+
+    $conn->close();
 }else{
     $conn->close();
 }
-?>
+
+// $conn = new mysqli($servername, $username, $password, $dbname);
+// $sql_check_category = "SELECT * FROM Category;";
+// $result_check_category = $conn->query($sql_check_category);
+// if($result_check_category==null){
+//   $nums_of_category=0;
+// }else {
+// $nums_of_category = $result_check_category->num_rows;
+// }
+// if($nums_of_category == 0){
+//     // add data to Catergory
+//     $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
+//     for($i = 0; $i < count($default_category); $i ++){
+//         $temp = $default_category[$i];
+//         $sqli = "INSERT INTO Category "."(description) "."VALUES "."('$temp')";
+//         $ins = $conn->query($sqli);
+//         if(!$ins)
+//         {
+//         exit('Can\'t insert new Category: '.mysqli_error($conn));
+//         }
+//     }
+//     // $sqli = "INSERT INTO `Category` (description) VALUES ('car')";
+//     if (mysqli_query($conn, $sqli)){
+//         echo '1';
+//     }else {
+//             echo '2';
+//             echo $conn -> error;
+//         }
+// }
+// Create connection again
+$conn = new mysqli($servername, $username, $password,$dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
+$sql_check_category = "SELECT * FROM Category;";
+$result_check_category = $conn->query($sql_check_category);
+$nums_of_category = $result_check_category->num_rows;
+echo("  ".$nums_of_category."  ");
+if($nums_of_category == 0){
+    // add data to Catergory
+    $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
+    for($i = 0; $i < count($default_category); $i ++){
+        $temp = $default_category[$i];
+        $sql = "INSERT INTO Category ".
+        "(description) ".
+        "VALUES ".
+        "('$temp')";
+        echo($sql);
+        $ins = $conn->query($sql);
+        if(!$ins)
+        {
+        exit('Can\'t insert new Category: '.mysqli_error($conn));
+        }
+    }
+}
+
+$conn->close();
+ ?>

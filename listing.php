@@ -2,20 +2,21 @@
 <?php require("utilities.php")?>
 
 <?php
+
   // Get info from the URL:
   $item_id = $_GET['item_id'];
 
   // TODO: Use item_id to make a query to the database.
   include_once("connect_database.php");
   $sql_auction = "SELECT Item.title, Item.description, Auction.currentPrice, Auction.reservePrice, Auction.endDate
-                  FROM Auction 
+                  FROM Auction
                   LEFT JOIN Item ON Item.itemID = Auction.itemID
                   WHERE Auction.itemID = $item_id;";
   $result_auction = $conn->query($sql_auction);
   $row_auction = $result_auction->fetch_assoc();
 
-  $sql_num_of_bids = "SELECT BiddingHistory.itemID, COUNT(*) AS num_bids 
-  FROM BiddingHistory 
+  $sql_num_of_bids = "SELECT BiddingHistory.itemID, COUNT(*) AS num_bids
+  FROM BiddingHistory
   GROUP BY BiddingHistory.itemID";
   $result_num_of_bids = $conn->query($sql_num_of_bids);
   $row_num_of_bids = $result_num_of_bids->fetch_assoc();
@@ -29,14 +30,14 @@
   // TODO: Note: Auctions that have ended may pull a different set of data,
   //       like whether the auction ended in a sale or was cancelled due
   //       to lack of high-enough bids. Or maybe not.
-  
+
   // Calculate time to auction end:
   $now = new DateTime();
   if ($now < $end_time) {
     $time_to_end = date_diff($now, $end_time);
     $time_remaining = ' (in ' . display_time_remaining($time_to_end) . ')';
   }
-  
+
   // TODO: If the user has a session, use it to make a query to the database
   //       to determine if the user is already watching this item.
   //       For now, this is hardcoded.
@@ -48,7 +49,7 @@
     }else{
       $watching = false;
     }
-  
+
 ?>
 
 
@@ -91,8 +92,8 @@
      This auction ended <?php echo(date_format($end_time, 'j M H:i')) ?>
      <!-- TODO: Print the result of the auction here? -->
      <?php
-     $sql_bidding_history = "SELECT buyerEmail, bidPrice 
-                                    FROM BiddingHistory 
+     $sql_bidding_history = "SELECT buyerEmail, bidPrice
+                                    FROM BiddingHistory
                                     WHERE bidPrice = (SELECT MAX(bidPrice) FROM BiddingHistory WHERE itemID = $item_id);";
           $result_bidding_history = $conn->query($sql_bidding_history);
           $row_bidding_history = $result_bidding_history->fetch_assoc();
@@ -113,7 +114,7 @@
           }
       ?>
 <?php else: ?>
-     Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p>  
+     Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p>
     <p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
     <!-- Pass item_id variable to place_bid.php-->
     <?php $_SESSION["item_id"] = $item_id ?>
@@ -129,7 +130,7 @@
     </form>
 <?php endif ?>
 
-  
+
   </div> <!-- End of right col with bidding info -->
 
 </div> <!-- End of row #2 -->
@@ -139,7 +140,7 @@
 <?php include_once("footer.php")?>
 
 
-<script> 
+<script>
 // JavaScript functions: addToWatchlist and removeFromWatchlist.
 
 function addToWatchlist(button) {
@@ -151,12 +152,12 @@ function addToWatchlist(button) {
     type: "POST",
     data: {functionname: 'add_to_watchlist', arguments: [<?php echo($item_id);?>]},
 
-    success: 
+    success:
       function (obj, textstatus) {
         // Callback function for when call is successful and returns obj
         console.log("Success");
         var objT = obj.trim();
- 
+
         if (objT == "success") {
           $("#watch_nowatch").hide();
           $("#watch_watching").show();
@@ -183,12 +184,12 @@ function removeFromWatchlist(button) {
     type: "POST",
     data: {functionname: 'remove_from_watchlist', arguments: [<?php echo($item_id);?>]},
 
-    success: 
+    success:
       function (obj, textstatus) {
         // Callback function for when call is successful and returns obj
         console.log("Success");
         var objT = obj.trim();
- 
+
         if (objT == "success") {
           $("#watch_watching").hide();
           $("#watch_nowatch").show();
