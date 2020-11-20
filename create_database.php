@@ -15,10 +15,13 @@ if ($conn->connect_error) {
 $sql_check_db_existence = "SELECT SCHEMA_NAME
 FROM INFORMATION_SCHEMA.SCHEMATA
 WHERE SCHEMA_NAME = '$dbname'";
+$databse_num = ($conn->query($sql_check_db_existence))->num_rows;
+$conn->close();
 
 //if there is no such database, then create one
-if(($conn->query($sql_check_db_existence))->num_rows === 0){
+if($databse_num === 0){
     // Create database
+    $conn = new mysqli($servername, $username, $password);
     $sql_db = "CREATE DATABASE $dbname";
     if ($conn->query($sql_db) === TRUE) {
         echo "Database created successfully.    ";
@@ -74,8 +77,8 @@ if(($conn->query($sql_check_db_existence))->num_rows === 0){
     `categoryID` int(11) NOT NULL,
     `startingPrice` double NOT NULL,
     `currentPrice` double NOT NULL,
-    `reservePrice` double NOT NULL,
-    `endDate` date NOT NULL,
+    `reservePrice` double NULL,
+    `endDate` datetime NOT NULL,
     PRIMARY KEY (`itemID`),
     KEY `sellerEmail` (`sellerEmail`),
     KEY `categoryID` (`categoryID`),

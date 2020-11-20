@@ -1,7 +1,12 @@
 <?php include_once("header.php")?>
+<<<<<<< HEAD
 <?php include_once("create_database.php")?>
 
 
+=======
+<?php include_once("create_database.php");
+?>
+>>>>>>> f375dcae8de5bb83741752d96d6c47a278c1bf4e
 <?php require("utilities.php")?>
 
 <div class="container">
