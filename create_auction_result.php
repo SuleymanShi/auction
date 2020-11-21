@@ -12,38 +12,45 @@
     $sherhold = 100;
     $newCategoryID = 0;
 
-    $con = @mysqli_connect('localhost','root','','comp0022',3306);     //connect to mysql
-    if(mysqli_connect_errno()){
-        exit(mysqli_connect_error());
-    }
-    mysqli_set_charset($con,'utf8');
+    
 
     if($_POST['auctionEndDate']<date("Y-m-d H:i:s")){
       echo"<script>alert('Wrong endDate');history.go(-1);</script>";
+      exit();
     }
 
     if(strlen($_POST['auctionTitle'])==0 or strlen($_POST['auctionDetails'])==0){
         echo"<script>alert('Please input the title or details');history.go(-1);</script>";
+        exit();
     }
 
-    if($_POST['auctionStartPrice']==0){
+    if($_POST['auctionStartPrice']==0 or $_POST['auctionReservePrice']==0){
       echo"<script>alert('Please enter the price');history.go(-1);</script>";
+      exit();
     }
 
     if(strlen($_POST['auctionTitle'])>30){                           //check the validation of data
         echo"<script>alert('The length of Title overflow(longer than 30)');history.go(-1);</script>";
+        exit();
     }
 
     if(strlen($_POST['auctionDetails'])>200){
       echo"<script>alert('The length of Details overflow(longer than 200)');history.go(-1);</script>";
+      exit();
     }
 
 
     if($_POST['auctionCate']=='Choose...'){
       echo"<script>alert('Please select a certain category');history.go(-1);</script>";
+      exit();
     }
 
     $auctionCategory = $_POST['auctionCate'];
+    $con = @mysqli_connect('localhost','root','','comp0022',3306);     //connect to mysql
+    if(mysqli_connect_errno()){
+        exit(mysqli_connect_error());
+    }
+    mysqli_set_charset($con,'utf8');
 
     if($_POST['auctionCate']=='other' and $_POST['newCategory']!=''){
       $newCategory = $_POST['newCategory'];
