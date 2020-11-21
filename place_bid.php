@@ -29,8 +29,13 @@ function send_mail($to, $subject, $msg){
             $mail->setFrom('comp0022.noreply@gmail.com', 'comp0022.noreply');
             $mail->addAddress($to);     // Add a recipient
             // Content
+            // Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $all_msg = file_get_contents("msg.html");
+            $all_msg = str_replace("msg",$msg,$all_msg);
+            $mail->AltBody = $msg;
             $mail->Subject = $subject;
-            $mail->Body    = $msg;
+            $mail->Body    = $all_msg;
             $mail->send();
             //test code
             //echo 'Message has been sent';
@@ -60,36 +65,35 @@ $highest_bid = $row_highest_bid["currentPrice"];
 ?>
 
 <?php if ($bid <= $highest_bid): ?>
-    <div class="text-center">Your bid(<?php echo($bid)?>) is lower than current highest bid(<?php echo($highest_bid)?>).You will be redirected shortly.</div>
+    <div style="text-align: center;font-size:30px"><b>bid(<?php echo($bid)?>) is lower than current highest bid(<?php echo($highest_bid)?>).You will be redirected shortly.</b></div>
 
 <?php else: ?>
-    <div class="text-center">Congratulations! You are the top bidder currently! You will be redirected shortly.</div>
+    <div style="text-align: center;font-size:30px"><b>Congratulations! You are the top bidder of this item currently! <b></div>
+    <div style="text-align: center;font-size:30px"><b>We will send your a confirmation email.  <b></div>
+    <div style="text-align: center;font-size:30px"><b>You will be redirected shortly or you can click the link below. <b></div>
+    <div style="text-align: center;font-size:30px"> <a href=<?php echo("listing.php?item_id=".$item_id); ?>>Back</a></div>
+    
     <?php
     $now = date('Y-m-d H:i:s');
-    echo($now);
     // Update the current price attribute of the auction
     $sql_update_auction="UPDATE Auction SET currentPrice=$bid WHERE itemID = $item_id";
     $conn->query($sql_update_auction);
 
-    //send emails to other bidders to tell them they have been outbidden.
+    //send emails to last top-bidders to tell him/her that he/she has been outbid.
     $sql_select_item="SELECT title, `description` FROM Item WHERE itemID = $item_id;" ;
     $row_select_item = ($conn->query($sql_select_item))->fetch_assoc();
-    $sql_select_bidding_history="SELECT buyerEmail FROM BiddingHistory WHERE itemID=$item_id GROUP BY buyerEmail";
+    $sql_select_bidding_history="SELECT buyerEmail FROM BiddingHistory WHERE itemID=$item_id AND biddingTime = (SELECT MAX(biddingTime) FROM BiddingHistory WHERE itemID = $item_id);";
     $result_select_bidding_history = $conn->query($sql_select_bidding_history);
+    $row_select_bidding_history = $result_select_bidding_history->fetch_assoc();
     if ($result_select_bidding_history->num_rows > 0) {
-        // send emails
-        while($row_select_bidding_history = $result_select_bidding_history->fetch_assoc()) {
-            if($row_select_bidding_history["buyerEmail"] != $_SESSION['username']){
-                $to = $row_select_bidding_history["buyerEmail"];
-                $subject = "You have been outbidden for ". $row_select_item["title"];
-                $msg = "The current price of ".$row_select_item["title"]." is ". $bid .". ";
-
-                // Instantiation and passing `true` enables exceptions
-                $mail = new PHPMailer(true);
-                send_mail($to, $subject, $msg);
-            }
-        }
+        $to = $row_select_bidding_history["buyerEmail"];
+        $subject = "[Auction] You have been outbid...";
+        $msg = "Sorry, you have been outbid for ". $row_select_item["title"] ."."."The current price of ".$row_select_item["title"]." is &pound". number_format($bid,2) .". ";
+        send_mail($to, $subject, $msg);
     }
+
+    //send confirmation email to current bidder
+    send_mail($buyerEmail,"[Auction] This is a confirmation email","Congratulations! You are the top bidder of ".$row_select_item["title"]." currently! Your bid is "."&pound$bid.");
 
     // Update the bidding history
     $sql_insert_bidding_history="INSERT INTO BiddingHistory(itemID, buyerEmail, biddingTime, bidPrice) VALUES ($item_id,'$buyerEmail','$now',$bid);";
@@ -102,8 +106,8 @@ $highest_bid = $row_highest_bid["currentPrice"];
         // send emails
         while($row_select_watchlist = $result_select_watchlist->fetch_assoc()) {
             $to = $row_select_watchlist["buyerEmail"];
-            $subject = "Someone just bidded on ". $row_select_item["title"];
-            $msg = "The current price of ".$row_select_item["title"]." is ". $bid .". ";
+            $subject = "[Auction] Someone just bid on ". $row_select_item["title"];
+            $msg = "Someone just bid on ". $row_select_item["title"].". The current price of ".$row_select_item["title"]." is &pound". number_format($bid,2) .". ";
             send_mail($to, $subject, $msg);
         }
     }
@@ -116,4 +120,4 @@ $highest_bid = $row_highest_bid["currentPrice"];
 $conn->close();
 //redirect to original listing.php 
 $url ="listing.php?item_id=".$item_id; 
-header("refresh:5;url=$url")?>
+header("refresh:15;url=$url")?>

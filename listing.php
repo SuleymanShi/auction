@@ -100,16 +100,16 @@
           if($result_bidding_history->num_rows >0){
             if($row_auction["reservePrice"] > 0 ){
               if($row_bidding_history["bidPrice"] >= $row_auction["reservePrice"]){
-                echo("Congratulateions! User ". $row_bidding_history["buyerEmail"]. " has won this item!". " The final bid price is ".$row_bidding_history["bidPrice"]);
+                echo("<hr>Congratulateions! User ". $row_bidding_history["buyerEmail"]. " has won this item!<hr>". " The final bid price is ".number_format($row_bidding_history["bidPrice"],2));
               }
               else{
-                echo("The top bid has not reached the reserve price. This item is passed in.");
+                echo("<hr>The top bid did not reach the reserve price. This item is passed in.");
               }
             }else{
-              echo("Congratulateions! User". $row_bidding_history["buyerEmail"]. " has won this item!". " The final bid price is ".$row_bidding_history["bidPrice"]);
+              echo("<hr>Congratulateions! User ". $row_bidding_history["buyerEmail"]. " has won this item!<hr>". " The final bid price is &pound".number_format($row_bidding_history["bidPrice"],2));
             }
           }else{
-            echo("Nobody bid on this item before end date. This item is passed in.");
+            echo("<hr>Nobody bid on this item before end date. This item is passed in.");
           }
       ?>
 <?php else: ?>
