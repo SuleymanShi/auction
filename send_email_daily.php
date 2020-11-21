@@ -15,7 +15,6 @@ require_once("PHPMailer/Exception.php");
 require_once("PHPMailer/OAuth.php");
 require_once("PHPMailer/POP3.php");
 ?>
-
 <?php
 function send_mail($to, $subject, $msg){
     // Instantiation and passing `true` enables exceptions
@@ -34,8 +33,13 @@ function send_mail($to, $subject, $msg){
             $mail->setFrom('comp0022.noreply@gmail.com', 'comp0022.noreply');
             $mail->addAddress($to);     // Add a recipient
             // Content
+            // Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $all_msg = file_get_contents("msg.html");
+            $all_msg = str_replace("msg",$msg,$all_msg);
+            $mail->AltBody = $msg;
             $mail->Subject = $subject;
-            $mail->Body    = $msg;
+            $mail->Body    = $all_msg;
             $mail->send();
             //test code
             //echo 'Message has been sent';
@@ -65,44 +69,81 @@ if ($result_select_winner_email_list->num_rows > 0) {
     while($row_select_winner_email_list = $result_select_winner_email_list->fetch_assoc()) {
         $auction_succeed = ($row_select_winner_email_list["reservePrice"] != 0 && $row_select_winner_email_list["buyerEmail"] != NULL &&  $row_select_winner_email_list["finalPrice"] >=$row_select_winner_email_list["reservePrice"])
                             || ($row_select_winner_email_list["reservePrice"] == 0 && $row_select_winner_email_list["buyerEmail"] != NULL);
+        $itemID_end = $row_select_winner_email_list["itemID"];
+        $sql_notice_watchList = "SELECT buyerEmail FROM WatchList WHERE itemID = $itemID_end;";
+        $result_notice_watchList = $conn->query($sql_notice_watchList);
         
         if($auction_succeed){
             // auction has been sold
 
             // send email to buyer
             $to = $row_select_winner_email_list["buyerEmail"];
-            $subject = "Congratulations! You have won the auction!";
-            $msg = "You have won the ".$row_select_winner_email_list["title"]."! Your final bid was ".$row_select_winner_email_list["finalPrice"].".";        
+            $subject = "[Auction] Congratulations! You have won the auction!";
+            $msg = "You have won the ".$row_select_winner_email_list["title"]."! Your final bid was &pound".number_format($row_select_winner_email_list["finalPrice"],2).".";        
             send_mail($to, $subject, $msg);
 
             //send email to seller
             $to = $row_select_winner_email_list["sellerEmail"];
-            $subject = "Congratulations! Your auction has been sold!";
-            $msg = "You have sold the ".$row_select_winner_email_list["title"]."! The final bid was ".$row_select_winner_email_list["finalPrice"].".";        
+            $subject = "[Auction] Congratulations! Your auction has been sold!";
+            $msg = "You have sold the ".$row_select_winner_email_list["title"]."! The final bid was &pound".number_format($row_select_winner_email_list["finalPrice"],2).".";        
             send_mail($to, $subject, $msg);
+
+            //send email to watchlist
+            if ($result_notice_watchList->num_rows > 0) {
+                // send emails
+                while($row_notice_watchList = $result_notice_watchList->fetch_assoc()) {
+                    $to = $row_notice_watchList["buyerEmail"];
+                    $subject = "[Auction] The auction on your watchlist has ended.";
+                    $msg = "The auction of ".$row_select_winner_email_list["title"]." has ended. The final price is &pound".number_format($row_select_winner_email_list["finalPrice"],2).".";
+                    send_mail($to, $subject, $msg);
+                }
+            }
         }else{
-            //auction has been passed
-            $subject = "Sorry, Your auction has been passed.";
-            $msg = "Your aution(".$row_select_winner_email_list["title"].") has been passed."; 
+            //auction has been passed in
 
             if($row_select_winner_email_list["buyerEmail"] == NULL){
                 // there is no bidder on this auction
+                $subject = "[Auction] Sorry, Your auction has been passed in.";
+                $msg = "Your aution(".$row_select_winner_email_list["title"].") has been passed in.";
                 $to = $row_select_winner_email_list["sellerEmail"];
                 send_mail($to, $subject, $msg);
+                //send email to watchlist
+                if ($result_notice_watchList->num_rows > 0) {
+                    // send emails
+                    while($row_notice_watchList = $result_notice_watchList->fetch_assoc()) {
+                        $to = $row_notice_watchList["buyerEmail"];
+                        $subject = "[Auction] The auction on your watchlist has ended.";
+                        $msg = "The auction of ".$row_select_winner_email_list["title"]." has been passed in";
+                        send_mail($to, $subject, $msg);
+                    }
+                }
             }else{
                 // fail to reach the reserve price
 
                 // send email to seller
+                $subject = "[Auction] Sorry, Your auction has been passed.";
+                $msg = "Your aution(".$row_select_winner_email_list["title"].") has been passed in.";
                 $to = $row_select_winner_email_list["sellerEmail"];
                 $final_price = $row_select_winner_email_list['finalPrice'];
                 $msg .= (" The final bid is "."$final_price.");
                 send_mail($to, $subject, $msg);
 
                 // send email to buyer
-                $subject = "Sorry, Your didn't win the auction.";
-                $msg = "Your bid(".$row_select_winner_email_list["finalPrice"].") didn't reach the reserve price.";
+                $subject = "[Auction] Sorry, Your didn't win the auction.";
+                $msg = "Your bid(&pound".number_format($row_select_winner_email_list["finalPrice"],2).") didn't reach the reserve price.";
                 $to = $row_select_winner_email_list["buyerEmail"];
                 send_mail($to, $subject, $msg);
+
+                //send email to watchlist
+                if ($result_notice_watchList->num_rows > 0) {
+                    // send emails
+                    while($row_notice_watchList = $result_notice_watchList->fetch_assoc()) {
+                        $to = $row_notice_watchList["buyerEmail"];
+                        $subject = "[Auction] The auction on your watchlist has ended.";
+                        $msg = "The auction of ".$row_select_winner_email_list["title"]." has been passed in because the final price (&pound".number_format($row_select_winner_email_list["finalPrice"],2).") failed to reach the reserve price.";
+                        send_mail($to, $subject, $msg);
+                    }
+                }
             }
             
         }
