@@ -18,7 +18,7 @@
   // TODO: Perform a query to pull up the auctions they've bidded on.
   
   // TODO: Loop through results and print them out as list items.
-  
+  session_start();
 ?>
 
 <?php
@@ -54,25 +54,27 @@
   //$_SESSION['username'] = '871222456@qq.com';
   $username = $_SESSION['username'];
 
-  $sql_number_of_bided_items =
-  "SELECT COUNT(itemId) AS number_of_bided_items
-  FROM BiddingHistory
+  $sql_number_of_bid_items =
+  "SELECT COUNT(itemId) AS number_of_bid_items
+  FROM (SELECT ItemID FROM
+        BiddingHistory
   WHERE BiddingHistory.buyerEmail = '$username' 
-  GROUP BY BiddingHistory.itemID;";
-  $result = $conn->query($sql_number_of_bided_items);
+  GROUP BY BiddingHistory.itemID)AS ItemBid";
+  $result = $conn->query($sql_number_of_bid_items);
   $row = $result->fetch_assoc();
  
   
   /* For the purposes of pagination, it would also be helpful to know the
   total number of results that satisfy the above query */
 
-  $num_results = $row["number_of_bided_items"]; // TODO: Calculate me for real
+  $num_results = $row["number_of_bid_items"]; // TODO: Calculate me for real
   $results_per_page = 10;
   $max_page = ceil($num_results / $results_per_page);
+ 
 
 
   $offset = ($curr_page-1) * $results_per_page;
-  $sql_auction_bidded_on =
+  $sql_auction_bid_on =
   "SELECT BiddingHistory.itemID, Item.title, Item.description, Auction.currentPrice,
   Auction.endDate, num.num_bids 
   FROM BiddingHistory 
@@ -86,7 +88,7 @@
   GROUP BY BiddingHistory.itemID 
   LIMIT $offset, $results_per_page;";
 
-  $result = $conn->query($sql_auction_bidded_on);
+  $result = $conn->query($sql_auction_bid_on);
 
   // TODO: Loop through results and print them out as list items.
   if ($result->num_rows > 0) {
@@ -96,7 +98,7 @@
       print_listing_li($row["itemID"], $row["title"], $row["description"], $row["currentPrice"], $row["num_bids"],$end_date);
     }
   } else {
-    echo "You haven't bidded on anything.";
+    echo "You haven't bid on anything.";
   }
   // close the connection to database.
   $conn->close();
@@ -117,9 +119,13 @@
     }
   }
   
+  //max(3 - 1, 0)=2
   $high_page_boost = max(3 - $curr_page, 0);
+  //max(2 - (2 - 1), 0)=1
   $low_page_boost = max(2 - ($max_page - $curr_page), 0);
+  //max(1, 1 - 2 - 1) = 1
   $low_page = max(1, $curr_page - 2 - $low_page_boost);
+  //min(2, 1 + 2 + 2) = 2
   $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
   
   if ($curr_page != 1) {
