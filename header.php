@@ -20,7 +20,7 @@
   <!-- Custom CSS file -->
   <link rel="stylesheet" href="css/custom.css">
 
-  <title>[My Auction Site] <!--CHANGEME!--></title>
+  <title>COMP0022</title>
   <script>
           function select_change() {       //this method of onchange when you select "other" is from the internet
               if (document.getElementById("auctionCate").value == "Other") {
