@@ -24,7 +24,7 @@
         exit();
     }
 
-    if($_POST['auctionStartPrice']==0 or $_POST['auctionReservePrice']==0){
+    if($_POST['auctionStartPrice']==0){
       echo"<script>alert('Please enter the price');history.go(-1);</script>";
       exit();
     }
