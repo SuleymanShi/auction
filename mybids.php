@@ -55,11 +55,9 @@
   $username = $_SESSION['username'];
 
   $sql_number_of_bid_items =
-  "SELECT COUNT(itemId) AS number_of_bid_items
-  FROM (SELECT ItemID FROM
+  "SELECT COUNT(DISTINCT ItemID) AS number_of_bid_items FROM
         BiddingHistory
-  WHERE BiddingHistory.buyerEmail = '$username' 
-  GROUP BY BiddingHistory.itemID)AS ItemBid";
+  WHERE BiddingHistory.buyerEmail = '$username'";
   $result = $conn->query($sql_number_of_bid_items);
   $row = $result->fetch_assoc();
  

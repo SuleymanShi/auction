@@ -54,16 +54,16 @@
 
     if($_POST['auctionCate']=='other' and $_POST['newCategory']!=''){
       $newCategory = $_POST['newCategory'];
-      $newcat = "select amount from newCategory where newdescription = \"".$newCategory."\"";
+      $newcat = "SELECT amount FROM newCategory WHERE newdescription = \"".$newCategory."\"";
       $resource = mysqli_query($con,$newcat);
       if(mysqli_num_rows($resource)!=0){
-        $addcount = "update newCategory SET amount = amount + 1 where newdescription = \"".$newCategory."\";";
+        $addcount = "UPDATE newCategory SET amount = amount + 1 WHERE newdescription = \"".$newCategory."\";";
         $add = mysqli_query($con, $addcount);
         if(!$add)
         {
         exit('Can\'t add the amount: '.mysqli_error($con));
         };
-        $findID = "select newCategoryID from newCategory where newdescription = \"".$newCategory."\"";
+        $findID = "SELECT newCategoryID FROM newCategory WHERE newdescription = \"".$newCategory."\"";
         $resource = mysqli_query($con, $findID);
         if(!$resource)
         {
@@ -82,7 +82,7 @@
               {
               exit('Can\'t insert new Category: '.mysqli_error($con));
               }
-              $findID = "select newCategoryID from newCategory where newdescription = \"".$newCategory."\"";
+              $findID = "SELECT newCategoryID FROM newCategory WHERE newdescription = \"".$newCategory."\"";
               $resource = mysqli_query($con, $findID);
                if(!$resource)
                {
@@ -94,7 +94,7 @@
             }
           }
 
-    $findnum = "select newdescription from newCategory where amount >= $sherhold";
+    $findnum = "SELECT newdescription FROM newCategory WHERE amount >= $sherhold";
     $resource = mysqli_query($con,$findnum);
     if(mysqli_num_rows($resource)!=0){
       while($row = mysqli_fetch_assoc($resource)) {
@@ -109,7 +109,7 @@
          exit('Can\'t insert new Category: '.mysqli_error($con));
          }
 
-         $sql = "SELECT newcategoryID from newcategory where newdescription = \"".$newdes."\"";
+         $sql = "SELECT newcategoryID FROM newcategory WHERE newdescription = \"".$newdes."\"";
          $sel = mysqli_query($con,$sql);
          if(!$sel)
          {
@@ -124,7 +124,7 @@
          {
          exit('Can\'t delete new Category: '.mysqli_error($con));
          }
-         $findID = "select categoryID from Category where description = \"".$newdes."\"";
+         $findID = "SELECT categoryID FROM Category WHERE description = \"".$newdes."\"";
          $sel = mysqli_query($con, $findID);
          if(!$sel)
          {
@@ -134,13 +134,13 @@
           $changeID = $row["categoryID"];
         }
          $auctionCategory = $_POST['newCategory'];
-         $change = "update Auction SET CategoryID = $changeID where newcategoryID = \"".$oldID."\";";
+         $change = "UPDATE Auction SET CategoryID = $changeID WHERE newcategoryID = \"".$oldID."\";";
           $cha = mysqli_query($con, $change);
          if(!$cha)
          {
           exit('Can\'t add the amount: '.mysqli_error($con));
          };
-         $change = "update Auction SET newcategoryID = 0 where newcategoryID = \"".$oldID."\";";
+         $change = "UPDATE Auction SET newcategoryID = 0 WHERE newcategoryID = \"".$oldID."\";";
           $cha = mysqli_query($con, $change);
          if(!$cha)
          {
@@ -157,7 +157,7 @@
 
 
 
-    $cat = "select categoryID from Category where description = \"".$auctionCategory."\"";
+    $cat = "SELECT categoryID FROM Category WHERE description = \"".$auctionCategory."\"";
     $resource = mysqli_query($con,$cat);
     while($row = mysqli_fetch_assoc($resource)) {
       $categoryID = $row["categoryID"];
@@ -187,7 +187,7 @@
 
     $itemID = 0;
 
-    $findID = "select max(itemID) from item";
+    $findID = "SELECT MAX(itemID) FROM Item";
 
     $resource = mysqli_query($con,$findID);
     while($row = mysqli_fetch_assoc($resource)) {

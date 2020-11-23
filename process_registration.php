@@ -73,9 +73,9 @@
   }
 
 
- // check wheher account has been registered or not
+ // check whether account has been registered or not
   $link=mysqli_connect($servername, $username, $password, $dbname);
-  $query="SELECT * from user where user.email='{$_POST['email']}'";
+  $query="SELECT * FROM User WHERE User.email='{$_POST['email']}'";
   $result=mysqli_query($link,$query);
   $user_data=mysqli_fetch_assoc($result);
   if (!empty($user_data)){
@@ -88,7 +88,7 @@
   $a=$_POST['email'];
   $b=$_POST['accountType'];
   $c=$_POST['password'];
-  $query="Insert into user (email, role, password) VALUES ('$a', '$b', '$c' )";
+  $query="INSERT INTO User (email, role, password) VALUES ('$a', '$b', '$c' )";
 
   if (mysqli_query($link, $query)){
       echo '<h2 class="my-3 text-center">Congratulations! Account has been created</h2>';
