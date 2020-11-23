@@ -118,14 +118,14 @@
     die("Connection failed: " . $con->connect_error);
   } 
 
-  $sql_select = "SELECT auction.itemID,title,description,currentPrice,endDate,num.num_bids
-                  FROM auction 
-                  LEFT JOIN item on auction.itemID = item.itemID and auction.sellerEmail = item.sellerEmail 
+  $sql_select = "SELECT Auction.itemID,title,description,currentPrice,endDate,num.num_bids
+                  FROM Auction 
+                  LEFT JOIN Item ON Auction.itemID = Item.itemID AND Auction.sellerEmail = Item.sellerEmail 
                   LEFT JOIN (SELECT BiddingHistory.itemID, COUNT(*) AS num_bids 
                         FROM BiddingHistory 
                         GROUP BY BiddingHistory.itemID) AS num
-                  ON num.itemID = auction.itemID
-                  WHERE (title like '%$keyword%' or description like '%$keyword%')";
+                  ON num.itemID = Auction.itemID
+                  WHERE (title like '%$keyword%' or description like '%$keyword%') AND endDate > NOW()";
   $result1 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering); 
   $num_results = mysqli_num_rows($result1);
   $results_per_page = 10;

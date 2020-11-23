@@ -51,7 +51,7 @@
                     exit(mysqli_connect_error());
                   }
                   mysqli_set_charset($con,'utf8');
-                  $sql = "select description from Category order by description ASC";
+                  $sql = "SELECT description FROM Category ORDER BY description ASC";
                   $resource = mysqli_query($con,$sql);
                   while($row = mysqli_fetch_assoc($resource)) {
                     echo "<option value ='".$row['description']."'>".$row['description']."</option>";
