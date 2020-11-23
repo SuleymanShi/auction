@@ -184,7 +184,7 @@
 
     $resource = mysqli_query($con,$findID);
     while($row = mysqli_fetch_assoc($resource)) {
-      $itemID = $row["max(itemID)"];
+      $itemID = $row["MAX(itemID)"];
     }
 
 
