@@ -11,14 +11,14 @@
   // This can be started after browse.php is working with a database.
   // Feel free to extract out useful functions from browse.php and put them in
   // the shared "utilities.php" where they can be shared by multiple files.
-  
-  
+
+
   // TODO: Check user's credentials (cookie/session).
-  
+
   // TODO: Perform a query to pull up the auctions they've bidded on.
-  
+
   // TODO: Loop through results and print them out as list items.
-  
+
 ?>
 
 <?php
@@ -47,7 +47,7 @@
   }
 
   // TODO: Perform a query to pull up the auctions they've bidded on.
-  
+
   //connect to database.
   include_once("connect_database.php");
   //for test
@@ -56,13 +56,14 @@
 
   $sql_number_of_bided_items =
   "SELECT COUNT(itemId) AS number_of_bided_items
-  FROM BiddingHistory
-  WHERE BiddingHistory.buyerEmail = '$username' 
-  GROUP BY BiddingHistory.itemID;";
+  FROM (SELECT ItemID FROM
+        BiddingHistory
+  WHERE BiddingHistory.buyerEmail = '$username'
+  GROUP BY BiddingHistory.itemID)AS ItemBid";
   $result = $conn->query($sql_number_of_bided_items);
   $row = $result->fetch_assoc();
- 
-  
+
+
   /* For the purposes of pagination, it would also be helpful to know the
   total number of results that satisfy the above query */
 
@@ -74,16 +75,16 @@
   $offset = ($curr_page-1) * $results_per_page;
   $sql_auction_bidded_on =
   "SELECT BiddingHistory.itemID, Item.title, Item.description, Auction.currentPrice,
-  Auction.endDate, num.num_bids 
-  FROM BiddingHistory 
-  LEFT JOIN Auction ON BiddingHistory.itemID = Auction.itemID 
-  LEFT JOIN Item ON BiddingHistory.itemID = Item.itemID 
-  LEFT JOIN (SELECT BiddingHistory.itemID, COUNT(*) AS num_bids 
-              FROM BiddingHistory 
+  Auction.endDate, num.num_bids
+  FROM BiddingHistory
+  LEFT JOIN Auction ON BiddingHistory.itemID = Auction.itemID
+  LEFT JOIN Item ON BiddingHistory.itemID = Item.itemID
+  LEFT JOIN (SELECT BiddingHistory.itemID, COUNT(*) AS num_bids
+              FROM BiddingHistory
               GROUP BY BiddingHistory.itemID) AS num
             ON num.itemID = BiddingHistory.itemID
-  WHERE BiddingHistory.buyerEmail = '$username' 
-  GROUP BY BiddingHistory.itemID 
+  WHERE BiddingHistory.buyerEmail = '$username'
+  GROUP BY BiddingHistory.itemID
   LIMIT $offset, $results_per_page;";
 
   $result = $conn->query($sql_auction_bidded_on);
@@ -116,12 +117,12 @@
       $querystring .= "$key=$value&amp;";
     }
   }
-  
+
   $high_page_boost = max(3 - $curr_page, 0);
   $low_page_boost = max(2 - ($max_page - $curr_page), 0);
   $low_page = max(1, $curr_page - 2 - $low_page_boost);
   $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
-  
+
   if ($curr_page != 1) {
     echo('
     <li class="page-item">
@@ -131,7 +132,7 @@
       </a>
     </li>');
   }
-    
+
   for ($i = $low_page; $i <= $high_page; $i++) {
     if ($i == $curr_page) {
       // Highlight the link
@@ -143,13 +144,13 @@
       echo('
     <li class="page-item">');
     }
-    
+
     // Do this in any case
     echo('
       <a class="page-link" href="mybids.php?' . $querystring . 'page=' . $i . '">' . $i . '</a>
     </li>');
   }
-  
+
   if ($curr_page != $max_page) {
     echo('
     <li class="page-item">

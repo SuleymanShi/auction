@@ -5,7 +5,7 @@
 
   // Get info from the URL:
   $item_id = $_GET['item_id'];
-  session_start();
+
   // TODO: Use item_id to make a query to the database.
   include_once("connect_database.php");
   $sql_auction = "SELECT Item.title, Item.description, Auction.currentPrice, Auction.reservePrice, Auction.endDate

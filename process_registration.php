@@ -27,7 +27,7 @@
 
   //check whether email is input
   if (empty($_POST['email'])){
-      echo '<h2 class="my-3 text-center">email missing</h2>';
+      echo '<h2 class="my-3 text-center">Email should not be empty!</h2>';
       header("refresh:3;url=register.php");
       exit();
   }
@@ -41,33 +41,33 @@
   }
   //check whether password is input
   if (empty($_POST['password'])){
-      echo '<h2 class="my-3 text-center">please type your password</h2>';
+      echo '<h2 class="my-3 text-center">Please enter your password!</h2>';
       header("refresh:3;url=register.php");
       exit();
   }
 
   //check whether password has suitable length
   if (strlen($_POST['password'])<6){
-    echo'<h2 class="my-3 text-center">Password is too short</h2>';
+    echo'<h2 class="my-3 text-center">Password is too short!</h2>';
     header("refresh:3;url=register.php");
     exit();
   }
   if (strlen($_POST['password'])>18){
-    echo'<h2 class="my-3 text-center">Password is too long</h2>';
+    echo'<h2 class="my-3 text-center">Password is too long!</h2>';
     header("refresh:3;url=register.php");
     exit();
   }
 
   //check whether confirmationpassword is input
   if (empty($_POST['passwordConfirmation'])){
-      echo'<h2 class="my-3 text-center">Please repeate your password</h2>';
+      echo'<h2 class="my-3 text-center">Please repeate your password!</h2>';
       header("refresh:3;url=register.php");
       exit();
   }
 
   //double check the password
   if ($_POST['passwordConfirmation']!==$_POST['password']){
-      echo '<h2 class="my-3 text-center">password do not match, try again</h2>';
+      echo '<h2 class="my-3 text-center">Password do not match, please try again!</h2>';
       header("refresh:3;url=register.php");
       exit();
   }

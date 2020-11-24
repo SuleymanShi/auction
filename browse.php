@@ -1,12 +1,5 @@
 <?php include_once("header.php")?>
-<<<<<<< HEAD
 <?php include_once("create_database.php")?>
-
-
-=======
-<?php include_once("create_database.php");
-?>
->>>>>>> f375dcae8de5bb83741752d96d6c47a278c1bf4e
 <?php require("utilities.php")?>
 
 <div class="container">
@@ -137,8 +130,7 @@
   $results_per_page = 10;
   $max_page = ceil($num_results / $results_per_page);
   $min_limit = ($curr_page - 1) * $results_per_page;
-  $max_limit = $curr_page * $results_per_page;
-  $sql_limit = " limit $min_limit, $max_limit";
+  $sql_limit = " limit $min_limit, $results_per_page";
   mysqli_close($con);
 ?>
 

@@ -16,7 +16,6 @@ $sql_check_db_existence = "SELECT SCHEMA_NAME
 FROM INFORMATION_SCHEMA.SCHEMATA
 WHERE SCHEMA_NAME = '$dbname'";
 $databse_num = ($conn->query($sql_check_db_existence))->num_rows;
-$conn->close();
 
 //if there is no such database, then create one
 if($databse_num === 0){
@@ -24,7 +23,7 @@ if($databse_num === 0){
     $conn = new mysqli($servername, $username, $password);
     $sql_db = "CREATE DATABASE $dbname";
     if ($conn->query($sql_db) === TRUE) {
-        echo "Database created successfully.    ";
+        
     } else {
         echo "Error creating database: " . $conn->error . ".  ";
     }
@@ -91,7 +90,6 @@ if($databse_num === 0){
     "Primary key(`newcategoryID`)".
     ")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
     if ($conn->multi_query($sql_tables) === TRUE) {
-            echo "Tables created successfully";
     } else {
         echo "Error creating tables: " . $conn->error;
     }
@@ -100,6 +98,8 @@ if($databse_num === 0){
 }else{
     $conn->close();
 }
+?>
+<?php
 
 // $conn = new mysqli($servername, $username, $password, $dbname);
 // $sql_check_category = "SELECT * FROM Category;";
@@ -138,7 +138,7 @@ if ($conn->connect_error) {
 $sql_check_category = "SELECT * FROM Category;";
 $result_check_category = $conn->query($sql_check_category);
 $nums_of_category = $result_check_category->num_rows;
-echo("  ".$nums_of_category."  ");
+
 if($nums_of_category == 0){
     // add data to Catergory
     $default_category = array("Electronic Device", "Household Commodity", "Jewellery", "House", "Art Work", "Fashion", "Car", "Book", "Other");
@@ -148,7 +148,7 @@ if($nums_of_category == 0){
         "(description) ".
         "VALUES ".
         "('$temp')";
-        echo($sql);
+
         $ins = $conn->query($sql);
         if(!$ins)
         {
