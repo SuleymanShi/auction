@@ -85,7 +85,7 @@
       $sql_category = " ";
     }
     else{
-      $sql_category = " and categoryID = (select categoryID from category where description = '$category')";
+      $sql_category = " AND categoryID = (SELECT categoryID FROM Category WHERE description = '$category')";
     }
   }
   
@@ -125,7 +125,7 @@
                         FROM BiddingHistory 
                         GROUP BY BiddingHistory.itemID) AS num
                   ON num.itemID = Auction.itemID
-                  WHERE (title like '%$keyword%' or description like '%$keyword%') AND endDate > NOW()";
+		  WHERE (title like '%$keyword%' or description like '%$keyword%') AND endDate > NOW()";
   $result1 = mysqli_query($con,$sql_select.$sql_category.$sql_ordering); 
   $num_results = mysqli_num_rows($result1);
   $results_per_page = 10;

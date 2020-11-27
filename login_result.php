@@ -58,7 +58,7 @@ if (empty($user_data)){
 
 //check whether password is correct
 if ($_POST['password']===$user_password){
-	echo '<h2 class="my-3 text-center">Login succesful! Jumping in 3s!</h2>';
+	echo '<h2 class="my-3 text-center">Login successful! Jumping in 3s!</h2>';
 	$_SESSION['logged_in'] = true;
   $_SESSION['username']=$_POST['email'];
 	$_SESSION['account_type'] = $user_data['role'];
