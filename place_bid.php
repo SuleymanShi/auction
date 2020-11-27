@@ -93,7 +93,7 @@ $highest_bid = $row_highest_bid["currentPrice"];
     }
 
     //send confirmation email to current bidder
-    send_mail($buyerEmail,"[Auction] This is a confirmation email","Congratulations! You are the top bidder of ".$row_select_item["title"]." currently! Your bid is "."&pound$bid.");
+    send_mail($buyerEmail,"[Auction] This is a confirmation email","Congratulations! You are the top bidder of ".$row_select_item["title"]." currently! Your bid is "."&pound".number_format($bid).".");
 
     // Update the bidding history
     $sql_insert_bidding_history="INSERT INTO BiddingHistory(itemID, buyerEmail, biddingTime, bidPrice) VALUES ($item_id,'$buyerEmail','$now',$bid);";

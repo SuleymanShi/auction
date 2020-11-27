@@ -93,7 +93,8 @@
       if($num_bids === NULL){
         $num_bids = 0;
       }
-      print_listing_li($row["itemID"], $row["title"], $row["description"], $row["currentPrice"], $num_bids ,$row["endDate"]);
+      $end_time = new DateTime($row["endDate"]);
+      print_listing_li($row["itemID"], $row["title"], $row["description"], $row["currentPrice"], $num_bids ,$end_time);
     }
   } else {
     echo "You haven't created any auction.";

@@ -27,7 +27,7 @@
 
   //check whether email is input
   if (empty($_POST['email'])){
-      echo '<h2 class="my-3 text-center">email missing</h2>';
+      echo '<h2 class="my-3 text-center">Email should not be empty!</h2>';
       header("refresh:3;url=register.php");
       exit();
   }
@@ -41,7 +41,7 @@
   }
   //check whether password is input
   if (empty($_POST['password'])){
-      echo '<h2 class="my-3 text-center">please type your password</h2>';
+      echo '<h2 class="my-3 text-center">please enter your password</h2>';
       header("refresh:3;url=register.php");
       exit();
   }
@@ -67,7 +67,7 @@
 
   //double check the password
   if ($_POST['passwordConfirmation']!==$_POST['password']){
-      echo '<h2 class="my-3 text-center">password do not match, try again</h2>';
+      echo '<h2 class="my-3 text-center">Password do not match, please try again</h2>';
       header("refresh:3;url=register.php");
       exit();
   }
@@ -88,7 +88,7 @@
   $a=$_POST['email'];
   $b=$_POST['accountType'];
   $c=$_POST['password'];
-  $query="INSERT INTO User (email, role, password) VALUES ('$a', '$b', '$c' )";
+  $query="Insert into User (email, role, password) VALUES ('$a', '$b', '$c' )";
 
   if (mysqli_query($link, $query)){
       echo '<h2 class="my-3 text-center">Congratulations! Account has been created</h2>';

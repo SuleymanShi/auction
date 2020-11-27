@@ -35,7 +35,7 @@ function send_mail($to, $subject, $msg){
             // Content
             // Content
             $mail->isHTML(true);                                  // Set email format to HTML
-            $all_msg = file_get_contents("msg.html");
+            $all_msg = file_get_contents("/var/www/auction/msg.html");
             $all_msg = str_replace("msg",$msg,$all_msg);
             $mail->AltBody = $msg;
             $mail->Subject = $subject;
@@ -125,7 +125,7 @@ if ($result_select_winner_email_list->num_rows > 0) {
                 $msg = "Your aution(".$row_select_winner_email_list["title"].") has been passed in.";
                 $to = $row_select_winner_email_list["sellerEmail"];
                 $final_price = $row_select_winner_email_list['finalPrice'];
-                $msg .= (" The final bid is "."$final_price.");
+                $msg .= (" The final bid is &pound".number_format($final_price,2).".");
                 send_mail($to, $subject, $msg);
 
                 // send email to buyer
